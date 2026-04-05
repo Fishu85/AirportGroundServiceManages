@@ -20,6 +20,13 @@ class AuthViewModel(
     var loggedIn by mutableStateOf(false)
     var info by mutableStateOf<String?>(null)
 
+    init {
+        val user = authRepo.currentUser()
+        if (user != null && user.isEmailVerified) {
+            loggedIn = true
+        }
+    }
+
     fun isEmailValid(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
@@ -134,5 +141,10 @@ class AuthViewModel(
                 error = msg
             }
         }
+    }
+
+    fun logout() {
+        authRepo.logout()
+        loggedIn = false
     }
 }
