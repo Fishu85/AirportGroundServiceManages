@@ -42,10 +42,12 @@ import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
 import com.example.agsm.ui.theme.SecondaryText
 import com.example.agsm.ui.theme.White
+import com.example.agsm.user.UserViewModel
 
 @Composable
 fun LoginScreen(
     vm: AuthViewModel = viewModel(),
+    userVm: UserViewModel,
     onLoggedIn: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
@@ -54,8 +56,10 @@ fun LoginScreen(
 
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    if (vm.loggedIn)
+    if (vm.loggedIn) {
+        userVm.loadUser()
         onLoggedIn()
+    }
 
     Column(
         modifier = Modifier
