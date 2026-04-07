@@ -107,7 +107,9 @@ fun LoginScreen(
             vm.error?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Error: $it",
-                    color = Color.Red
+                    color = Color.Red,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
                 )
             }
 

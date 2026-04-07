@@ -17,6 +17,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +37,6 @@ import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
 import com.example.agsm.ui.theme.White
-import com.example.agsm.user.User
 import com.example.agsm.user.UserViewModel
 
 @Composable
@@ -42,6 +46,13 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     onReturn: () -> Unit
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var dialogError by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(vmAuth.error) {
+        dialogError = vmAuth.error
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -213,7 +224,8 @@ fun ProfileScreen(
         ) {
             Button(
                 onClick = {
-
+                    dialogError = null
+                    showDeleteDialog = true
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Red,
@@ -231,6 +243,8 @@ fun ProfileScreen(
                             .size(16.dp)
                     )
 
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Text("Delete account",
                         color = White,
                         fontWeight = FontWeight.Bold,
@@ -238,5 +252,25 @@ fun ProfileScreen(
                 }
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        DeleteAccountDialog(
+            onConfirm = { password ->
+                vmAuth.deleteAccount(
+                    email = userVm.user!!.email,
+                    password = password
+                ) {
+                    showDeleteDialog = false
+                    onLogout()
+                }
+                dialogError = vmAuth.error
+            },
+            onDismiss = {
+                dialogError = null
+                showDeleteDialog = false
+            },
+            errorMessage = dialogError
+        )
     }
 }

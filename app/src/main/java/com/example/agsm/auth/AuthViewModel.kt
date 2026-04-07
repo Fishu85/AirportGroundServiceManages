@@ -153,4 +153,29 @@ class AuthViewModel(
         authRepo.logout()
         loggedIn = false
     }
+
+    fun deleteAccount(
+        email: String,
+        password: String,
+        onDeleted: () -> Unit
+    ) {
+        val uid = authRepo.currentUser()?.uid ?: return
+
+        loading = true
+        error = null
+
+        authRepo.deleteAccount(email, password) { success, msg ->
+            if (!success) {
+                loading = false
+                error = msg
+                return@deleteAccount
+            }
+
+            userRepo.deleteUser(uid) {
+                loading = false
+                loggedIn = false
+                onDeleted()
+            }
+        }
+    }
 }

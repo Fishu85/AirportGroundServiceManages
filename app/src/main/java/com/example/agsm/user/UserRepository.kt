@@ -20,4 +20,13 @@ class UserRepository(
                 onResult(snap.toObject(User::class.java))
             }
     }
+
+    fun deleteUser(uid: String, onResult: (Boolean) -> Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .delete()
+            .addOnSuccessListener { onResult(true) }
+            .addOnFailureListener { onResult(false) }
+    }
 }
