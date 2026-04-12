@@ -47,7 +47,13 @@ fun ProfileScreen(
     onReturn: () -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
     var dialogError by remember { mutableStateOf<String?>(null) }
+    var showPasswordDialog by remember { mutableStateOf(false) }
+
+    var pendingName by remember { mutableStateOf("") }
+    var pendingEmail by remember { mutableStateOf("") }
+    var editError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(vmAuth.error) {
         dialogError = vmAuth.error
@@ -187,7 +193,8 @@ fun ProfileScreen(
             ) {
                 Button(
                     onClick = {
-
+                        dialogError = null
+                        showEditDialog = true
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SecondaryForeground,
@@ -271,6 +278,52 @@ fun ProfileScreen(
                 showDeleteDialog = false
             },
             errorMessage = dialogError
+        )
+    }
+
+    if (showPasswordDialog) {
+        PasswordDialog(
+            errorMessage = editError,
+            onConfirm = { password ->
+                userVm.updateUser(pendingName, pendingEmail, password) { success, msg ->
+                    if (success) {
+                        showPasswordDialog = false
+                        showEditDialog = false
+                    } else {
+                        editError = msg
+                    }
+                }
+            },
+            onDismiss = {
+                showPasswordDialog = false
+            }
+        )
+    }
+
+    if (showEditDialog) {
+        EditUserDialog(
+            currentName = userVm.user?.name ?: "",
+            currentEmail = userVm.user?.email ?: "",
+            errorMessage = dialogError,
+            onConfirm = { newName, newEmail ->
+                if (newEmail != userVm.user?.email) {
+                    pendingName = newName
+                    pendingEmail = newEmail
+                    showPasswordDialog = true
+                } else {
+                    userVm.updateUser(newName, newEmail, "") { success, msg ->
+                        if (success) {
+                            showEditDialog = false
+                        } else {
+                            dialogError = msg
+                        }
+                    }
+                }
+            },
+            onDismiss = {
+                dialogError = null
+                showEditDialog = false
+            }
         )
     }
 }

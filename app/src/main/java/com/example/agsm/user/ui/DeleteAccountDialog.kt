@@ -152,7 +152,7 @@ fun DeleteAccountDialog(
         dismissButton = {
             Button(
                 onClick = {
-                    onDismiss
+                    onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SecondaryForeground

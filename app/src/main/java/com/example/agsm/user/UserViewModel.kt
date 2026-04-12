@@ -13,6 +13,8 @@ class UserViewModel(
     var user by mutableStateOf<User?>(null)
         private set
 
+    var error by mutableStateOf<String?>(null)
+
     fun loadUser() {
         val uid = authRepo.currentUser()?.uid ?: return
 
@@ -23,5 +25,39 @@ class UserViewModel(
 
     fun clear() {
         user = null
+    }
+
+    fun updateUser(
+        name: String,
+        email: String,
+        password: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val uid = authRepo.currentUser()?.uid
+        if (uid == null) {
+            onResult(false, "Not logged in")
+            return
+        }
+        if (name.isBlank()) {
+            onResult(false, "Name cannot be empty")
+            return
+        }
+        if (email.isBlank()) {
+            onResult(false, "Email cannot be empty")
+        }
+
+        userRepo.updateUser(uid, name, email, password) { success, msg ->
+            if (success) {
+                user = user?.copy(
+                    name = name,
+                    email = email
+                )
+                error = null
+                onResult(true, null)
+            } else {
+                error = msg
+                onResult(false, msg)
+            }
+        }
     }
 }

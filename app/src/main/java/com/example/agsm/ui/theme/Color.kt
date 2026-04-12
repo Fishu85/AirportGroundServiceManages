@@ -19,3 +19,4 @@ val PrimaryText = Color(0xFFFFFFFF)
 val SecondaryText = Color(0xFF888899)
 
 val White = Color(0xFFFFFFFF)
+val Green = Color(0xFF009900)
