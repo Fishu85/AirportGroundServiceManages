@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.agsm.R
 import com.example.agsm.auth.AuthViewModel
+import com.example.agsm.auth.AuthViewModelFactory
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
@@ -41,7 +43,6 @@ import com.example.agsm.user.UserViewModel
 
 @Composable
 fun ProfileScreen(
-    vmAuth: AuthViewModel = viewModel(),
     userVm: UserViewModel,
     onLogout: () -> Unit,
     onReturn: () -> Unit
@@ -54,6 +55,9 @@ fun ProfileScreen(
     var pendingName by remember { mutableStateOf("") }
     var pendingEmail by remember { mutableStateOf("") }
     var editError by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+    val vmAuth: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
 
     LaunchedEffect(vmAuth.error) {
         dialogError = vmAuth.error

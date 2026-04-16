@@ -15,18 +15,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -36,17 +43,21 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.agsm.R
 import com.example.agsm.auth.AuthViewModel
+import com.example.agsm.auth.AuthViewModelFactory
+import com.example.agsm.auth.EmailHistory
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
 import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
 import com.example.agsm.ui.theme.SecondaryText
+import com.example.agsm.ui.theme.TertiaryForeground
 import com.example.agsm.ui.theme.White
 import com.example.agsm.user.UserViewModel
+import kotlin.math.exp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    vm: AuthViewModel = viewModel(),
     userVm: UserViewModel,
     onLoggedIn: () -> Unit,
     onRegisterClick: () -> Unit
@@ -55,6 +66,12 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
 
     var passwordVisibility by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val vm: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
+
+    val savedEmails by EmailHistory.getEmails(context).collectAsState(initial = emptyList())
+    var expanded by remember { mutableStateOf(false) }
 
     if (vm.loggedIn) {
         userVm.loadUser()
@@ -119,25 +136,59 @@ fun LoginScreen(
                     color = Color.Green)
             }
 
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("E-mail") },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = PrimaryForeground,
-                    focusedContainerColor = PrimaryForeground,
-                    unfocusedTextColor = SecondaryText,
-                    focusedTextColor = White,
-                    unfocusedLabelColor = SecondaryText,
-                    focusedLabelColor = White,
-                    unfocusedIndicatorColor = PrimaryForeground,
-                    focusedIndicatorColor = White,
-                    cursorColor = White
-                ),
-                modifier = Modifier
-                    .padding(top = 16.dp)
-            )
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = it }
+            ) {
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("E-mail") },
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = PrimaryForeground,
+                        focusedContainerColor = PrimaryForeground,
+                        unfocusedTextColor = SecondaryText,
+                        focusedTextColor = White,
+                        unfocusedLabelColor = SecondaryText,
+                        focusedLabelColor = White,
+                        unfocusedIndicatorColor = PrimaryForeground,
+                        focusedIndicatorColor = White,
+                        cursorColor = White
+                    ),
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .menuAnchor()
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                expanded = true
+                            }
+                        }
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    containerColor = TertiaryForeground
+                ) {
+                    savedEmails
+                        .filter { it.startsWith(email, ignoreCase = true) }
+                        .forEach { suggestion ->
+                            DropdownMenuItem(
+                                text = { Text(suggestion,
+                                    color = SecondaryText) },
+                                onClick = {
+                                    email = suggestion
+                                    expanded = false
+                                }
+                            )
+                        }
+                }
+            }
+
+
+
             Spacer(modifier = Modifier.height(12.dp))
+
             TextField(
                 value = password,
                 onValueChange = { password = it },

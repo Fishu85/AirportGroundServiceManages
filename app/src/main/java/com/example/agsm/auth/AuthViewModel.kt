@@ -1,5 +1,6 @@
 package com.example.agsm.auth
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +13,7 @@ import com.example.agsm.user.UserViewModel
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
+    private val appContext: Context,
     private val authRepo: AuthRepository = AuthRepository(),
     private val userRepo: UserRepository = UserRepository(),
     private val vmUser: UserViewModel = UserViewModel()
@@ -21,8 +23,6 @@ class AuthViewModel(
     var error by mutableStateOf<String?>(null)
     var loggedIn by mutableStateOf(false)
     var info by mutableStateOf<String?>(null)
-    var currentUser by mutableStateOf<User?>(null)
-        private set
 
     init {
         val user = authRepo.currentUser()
@@ -115,6 +115,10 @@ class AuthViewModel(
             if (!success) {
                 error = msg
                 return@login
+            }
+
+            viewModelScope.launch {
+                EmailHistory.saveEmail(appContext, email)
             }
 
             authRepo.currentUser()?.reload()?.addOnCompleteListener {

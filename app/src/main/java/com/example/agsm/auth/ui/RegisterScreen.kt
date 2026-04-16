@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -40,6 +41,7 @@ import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.user.Role
 import com.example.agsm.user.ui.DropdownMenuRoleSelector
 import com.example.agsm.R
+import com.example.agsm.auth.AuthViewModelFactory
 import com.example.agsm.ui.theme.PrimaryForeground
 import com.example.agsm.ui.theme.PrimaryText
 import com.example.agsm.ui.theme.SecondaryForeground
@@ -48,7 +50,6 @@ import com.example.agsm.ui.theme.White
 
 @Composable
 fun RegisterScreen(
-    vm: AuthViewModel = viewModel(),
     onRegistered: () -> Unit,
     onLoginClick: () -> Unit
 ) {
@@ -60,6 +61,9 @@ fun RegisterScreen(
 
     var passwordVisibility by remember { mutableStateOf(false) }
     var confirmPasswordVisibility by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val vm: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
 
     if (vm.loggedIn)
         onRegistered()
