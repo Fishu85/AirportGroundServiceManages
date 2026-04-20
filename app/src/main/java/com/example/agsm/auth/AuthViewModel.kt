@@ -9,14 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.agsm.user.Role
 import com.example.agsm.user.User
 import com.example.agsm.user.UserRepository
-import com.example.agsm.user.UserViewModel
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val appContext: Context,
     private val authRepo: AuthRepository = AuthRepository(),
-    private val userRepo: UserRepository = UserRepository(),
-    private val vmUser: UserViewModel = UserViewModel()
+    private val userRepo: UserRepository = UserRepository()
 ): ViewModel() {
 
     var loading by mutableStateOf(false)
@@ -28,7 +26,6 @@ class AuthViewModel(
         val user = authRepo.currentUser()
         if (user != null && user.isEmailVerified) {
             loggedIn = true
-            vmUser.loadUser()
         }
     }
 
@@ -130,7 +127,6 @@ class AuthViewModel(
                 }
 
                 loggedIn = true
-                vmUser.loadUser()
             }
         }
     }

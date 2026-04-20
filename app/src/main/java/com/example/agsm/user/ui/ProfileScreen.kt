@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,13 +55,13 @@ fun ProfileScreen(
 
     var pendingName by remember { mutableStateOf("") }
     var pendingEmail by remember { mutableStateOf("") }
-    var editError by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     val vmAuth: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
+    var authError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(vmAuth.error) {
-        dialogError = vmAuth.error
+        authError = vmAuth.error
     }
 
     Column(
@@ -138,6 +139,18 @@ fun ProfileScreen(
                     color = White,
                     fontSize = 16.sp)
             }
+        }
+
+        if (dialogError != null) {
+            Text(dialogError!!,
+                color = Color.Red)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (authError != null) {
+            Text(authError!!,
+                color = Color.Red)
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
         Column(
@@ -278,23 +291,23 @@ fun ProfileScreen(
                 dialogError = vmAuth.error
             },
             onDismiss = {
-                dialogError = null
                 showDeleteDialog = false
             },
-            errorMessage = dialogError
+            errorMessage = null
         )
     }
 
     if (showPasswordDialog) {
         PasswordDialog(
-            errorMessage = editError,
+            errorMessage = dialogError,
             onConfirm = { password ->
                 userVm.updateUser(pendingName, pendingEmail, password) { success, msg ->
                     if (success) {
+                        dialogError = msg
                         showPasswordDialog = false
                         showEditDialog = false
                     } else {
-                        editError = msg
+                        dialogError = msg
                     }
                 }
             },
@@ -317,6 +330,7 @@ fun ProfileScreen(
                 } else {
                     userVm.updateUser(newName, newEmail, "") { success, msg ->
                         if (success) {
+                            dialogError = msg
                             showEditDialog = false
                         } else {
                             dialogError = msg
@@ -325,7 +339,6 @@ fun ProfileScreen(
                 }
             },
             onDismiss = {
-                dialogError = null
                 showEditDialog = false
             }
         )

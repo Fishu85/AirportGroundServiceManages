@@ -53,7 +53,7 @@ class UserViewModel(
                     email = email
                 )
                 error = null
-                onResult(true, null)
+                onResult(true, msg)
             } else {
                 error = msg
                 onResult(false, msg)

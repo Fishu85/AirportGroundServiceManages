@@ -42,17 +42,29 @@ class UserRepository(
         val user = FirebaseAuth.getInstance().currentUser
         val oldEmail = user?.email
 
-        if (email != oldEmail) {
-            updateUserEmailAuth(email, password) { successAuth, msgAuth ->
-                if (!successAuth) {
-                    onResult(false, msgAuth)
-                    return@updateUserEmailAuth
-                }
-
-                updateFirestoreUser(uid, name, email, onResult)
-            }
-        } else {
+        if (oldEmail == email) {
             updateFirestoreUser(uid, name, email, onResult)
+            return
+        }
+
+        if (password.isBlank()) {
+            onResult(false, "Password is required to change email")
+            return
+        }
+
+        updateUserEmailAuth(email, password) { successAuth, msgAuth ->
+            if (!successAuth) {
+                onResult(false, msgAuth)
+                return@updateUserEmailAuth
+            }
+
+            updateFirestoreUser(uid, name, email) { successFs, msgFs ->
+                if (successFs) {
+                    onResult(true, msgAuth)
+                } else {
+                    onResult(false, msgFs)
+                }
+            }
         }
     }
 
@@ -70,7 +82,7 @@ class UserRepository(
         db.collection("users")
             .document(uid)
             .update(updates)
-            .addOnSuccessListener { onResult(true, null) }
+            .addOnSuccessListener { onResult(true, "Profile updated") }
             .addOnFailureListener { e -> onResult(false, e.message) }
     }
 
