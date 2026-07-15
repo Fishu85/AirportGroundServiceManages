@@ -32,10 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.agsm.R
 import com.example.agsm.auth.AuthViewModel
-import com.example.agsm.auth.AuthViewModelFactory
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
@@ -45,6 +43,7 @@ import com.example.agsm.user.UserViewModel
 @Composable
 fun ProfileScreen(
     userVm: UserViewModel,
+    authVm: AuthViewModel,
     onLogout: () -> Unit,
     onReturn: () -> Unit
 ) {
@@ -57,11 +56,10 @@ fun ProfileScreen(
     var pendingEmail by remember { mutableStateOf("") }
 
     val context = LocalContext.current
-    val vmAuth: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
     var authError by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(vmAuth.error) {
-        authError = vmAuth.error
+    LaunchedEffect(authVm.error) {
+        authError = authVm.error
     }
 
     Column(
@@ -103,7 +101,7 @@ fun ProfileScreen(
                     colorFilter = ColorFilter.tint(White),
                     modifier = Modifier
                         .clickable{
-                            vmAuth.logout()
+                            authVm.logout()
                             onLogout()
                         }
                         .size(32.dp)
@@ -281,14 +279,14 @@ fun ProfileScreen(
     if (showDeleteDialog) {
         DeleteAccountDialog(
             onConfirm = { password ->
-                vmAuth.deleteAccount(
+                authVm.deleteAccount(
                     email = userVm.user!!.email,
                     password = password
                 ) {
                     showDeleteDialog = false
                     onLogout()
                 }
-                dialogError = vmAuth.error
+                dialogError = authVm.error
             },
             onDismiss = {
                 showDeleteDialog = false

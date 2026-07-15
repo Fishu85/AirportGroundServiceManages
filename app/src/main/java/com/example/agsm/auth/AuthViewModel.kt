@@ -21,11 +21,13 @@ class AuthViewModel(
     var error by mutableStateOf<String?>(null)
     var loggedIn by mutableStateOf(false)
     var info by mutableStateOf<String?>(null)
+    var onUserLoggedIn: (() -> Unit)? = null
 
     init {
         val user = authRepo.currentUser()
         if (user != null && user.isEmailVerified) {
             loggedIn = true
+            onUserLoggedIn?.invoke()
         }
     }
 
@@ -84,7 +86,11 @@ class AuthViewModel(
                     airportId = null
                 )
 
-                userRepo.createUser(user)
+                userRepo.createUser(user) { success, msg ->
+                    if (!success) {
+                        error = "Firestore error: $msg"
+                    }
+                }
                 error = null
                 info = "Verification email sent. Check your inbox."
             }
@@ -127,6 +133,7 @@ class AuthViewModel(
                 }
 
                 loggedIn = true
+                onUserLoggedIn?.invoke()
             }
         }
     }

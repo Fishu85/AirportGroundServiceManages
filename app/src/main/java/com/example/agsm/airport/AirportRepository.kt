@@ -1,0 +1,48 @@
+package com.example.agsm.airport
+
+import com.example.agsm.user.User
+import com.google.firebase.firestore.FirebaseFirestore
+
+class AirportRepository (
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+) {
+    fun createAirport(
+        icao: String,
+        iata: String,
+        airportName: String,
+        joinCode: String,
+        manager: User?,
+        onResult: (Boolean, String?, Airport?) -> Unit
+    ) {
+        val docRef = db.collection("airports").document()
+        val airportId = docRef.id
+        val airport = Airport(
+            airportId = airportId,
+            icao = icao,
+            iata = iata,
+            airportName = airportName,
+            joinCode = joinCode,
+            manager = manager
+        )
+
+        docRef.set(airport)
+            .addOnSuccessListener {
+                onResult(true, "Airport created", airport)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message, null)
+            }
+    }
+
+    fun getAirport(
+        airportId: String,
+        onResult: (Airport?) -> Unit
+    ) {
+        db.collection("airports")
+            .document(airportId)
+            .get()
+            .addOnSuccessListener { snap ->
+                onResult(snap.toObject(Airport::class.java))
+            }
+    }
+}

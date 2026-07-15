@@ -1,6 +1,5 @@
 package com.example.agsm.user
 
-import androidx.compose.animation.core.snap
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -8,10 +7,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 class UserRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
-    fun createUser(user: User) {
+    fun createUser(user: User, onResult: (Boolean, String?) -> Unit = {_, _ ->}) {
         db.collection("users")
             .document(user.uid)
             .set(user)
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
     }
 
     fun getUser(uid: String, onResult: (User?) -> Unit) {

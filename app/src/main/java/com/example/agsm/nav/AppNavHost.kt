@@ -5,10 +5,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.agsm.auth.AuthViewModel
+import com.example.agsm.auth.AuthViewModelFactory
 import com.example.agsm.auth.ui.LoginScreen
 import com.example.agsm.auth.ui.RegisterScreen
 import com.example.agsm.home.ui.HomeScreen
@@ -27,7 +30,13 @@ fun AppNavHost() {
 
     val hideTopBar = currentRoute in listOf("login", "register", "profile")
 
+    val context = LocalContext.current
+    val authVm: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
     val userVm: UserViewModel = viewModel()
+
+    authVm.onUserLoggedIn = {
+        userVm.loadUser()
+    }
 
     Scaffold(
         topBar = {
@@ -89,6 +98,7 @@ fun AppNavHost() {
             composable("profile") {
                 ProfileScreen(
                     userVm = userVm,
+                    authVm = authVm,
                     onLogout = {
                         nav.navigate("login") {
                             popUpTo("home") {
