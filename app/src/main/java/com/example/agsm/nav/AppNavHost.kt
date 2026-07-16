@@ -16,6 +16,7 @@ import com.example.agsm.auth.ui.LoginScreen
 import com.example.agsm.auth.ui.RegisterScreen
 import com.example.agsm.home.ui.HomeScreen
 import com.example.agsm.nav.ui.AppTopBar
+import com.example.agsm.nav.ui.BottomNavBar
 import com.example.agsm.user.UserViewModel
 import com.example.agsm.user.ui.ProfileScreen
 
@@ -28,7 +29,7 @@ fun AppNavHost() {
         .collectAsState(initial = nav.currentBackStackEntry)
         .value?.destination?.route
 
-    val hideTopBar = currentRoute in listOf("login", "register", "profile")
+    val hideTopBottomBar = currentRoute in listOf("login", "register", "profile")
 
     val context = LocalContext.current
     val authVm: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
@@ -40,8 +41,13 @@ fun AppNavHost() {
 
     Scaffold(
         topBar = {
-            if (!hideTopBar) {
+            if (!hideTopBottomBar) {
                 AppTopBar(nav)
+            }
+        },
+        bottomBar = {
+            if (!hideTopBottomBar) {
+                BottomNavBar()
             }
         }
     ) { padding ->
