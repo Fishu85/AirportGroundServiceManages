@@ -45,4 +45,16 @@ class AirportRepository (
                 onResult(snap.toObject(Airport::class.java))
             }
     }
+
+    fun assignAirportToUser(userId: String, airportId: String, onResult: (Boolean, String?) -> Unit) {
+        db.collection("users")
+            .document(userId)
+            .update("airportId", airportId)
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }

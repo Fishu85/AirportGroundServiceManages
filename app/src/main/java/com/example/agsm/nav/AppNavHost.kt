@@ -10,6 +10,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.agsm.airport.AirportViewModel
+import com.example.agsm.airport.ui.AirportListScreen
 import com.example.agsm.auth.AuthViewModel
 import com.example.agsm.auth.AuthViewModelFactory
 import com.example.agsm.auth.ui.LoginScreen
@@ -34,6 +36,7 @@ fun AppNavHost() {
     val context = LocalContext.current
     val authVm: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
     val userVm: UserViewModel = viewModel()
+    val airportVm: AirportViewModel = viewModel()
 
     authVm.onUserLoggedIn = {
         userVm.loadUser()
@@ -47,7 +50,7 @@ fun AppNavHost() {
         },
         bottomBar = {
             if (!hideTopBottomBar) {
-                BottomNavBar()
+                BottomNavBar(nav)
             }
         }
     ) { padding ->
@@ -119,6 +122,13 @@ fun AppNavHost() {
                             }
                         }
                     }
+                )
+            }
+
+            composable("airport_list") {
+                AirportListScreen(
+                    userVm = userVm,
+                    airportVm = airportVm
                 )
             }
         }

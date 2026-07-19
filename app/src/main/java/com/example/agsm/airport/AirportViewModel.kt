@@ -36,6 +36,11 @@ class AirportViewModel (
             return
         }
 
+        if (joinCode.isBlank()) {
+            onResult(false, "Join code cannot be empty")
+            return
+        }
+
         airportRepo.createAirport(
             icao = icao,
             iata = iata,
@@ -46,7 +51,20 @@ class AirportViewModel (
             if (ok) {
                 airport = createdAirport
                 error = null
+                manager?.let { user ->
+                    airportRepo.assignAirportToUser(
+                        userId = user.uid,
+                        airportId = createdAirport!!.airportId
+                    ) { userOk, userMsg ->
+                        if (!userOk) {
+                            error = userMsg
+                        }
+                    }
+                }
                 onResult(true, msg)
+            } else {
+                error = msg
+                onResult(false, msg)
             }
         }
 

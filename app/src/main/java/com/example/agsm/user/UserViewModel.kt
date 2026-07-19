@@ -60,4 +60,8 @@ class UserViewModel(
             }
         }
     }
+
+    fun updateUserAirportId(airportId: String?) {
+        user = user?.copy(airportId = airportId)
+    }
 }
