@@ -2,11 +2,9 @@ package com.example.agsm.airport
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.retain.retainManagedRetainedValuesStore
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.agsm.user.User
-import com.google.firebase.firestore.FirebaseFirestore
 
 class AirportViewModel (
     private val airportRepo: AirportRepository = AirportRepository()
@@ -68,5 +66,13 @@ class AirportViewModel (
             }
         }
 
+    }
+
+    fun getAirport(
+        airportId: String?
+    ) {
+        airportRepo.getAirport(airportId) { loadedAirport ->
+            airport = loadedAirport
+        }
     }
 }

@@ -19,7 +19,10 @@ class UserRepository(
             }
     }
 
-    fun getUser(uid: String, onResult: (User?) -> Unit) {
+    fun getUser(
+        uid: String,
+        onResult: (User?) -> Unit
+    ) {
         db.collection("users")
             .document(uid)
             .get()

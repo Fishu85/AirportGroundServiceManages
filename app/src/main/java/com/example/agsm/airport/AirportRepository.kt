@@ -35,15 +35,17 @@ class AirportRepository (
     }
 
     fun getAirport(
-        airportId: String,
+        airportId: String?,
         onResult: (Airport?) -> Unit
     ) {
-        db.collection("airports")
-            .document(airportId)
-            .get()
-            .addOnSuccessListener { snap ->
-                onResult(snap.toObject(Airport::class.java))
-            }
+        if (airportId != null) {
+            db.collection("airports")
+                .document(airportId)
+                .get()
+                .addOnSuccessListener { snap ->
+                    onResult(snap.toObject(Airport::class.java))
+                }
+        }
     }
 
     fun assignAirportToUser(userId: String, airportId: String, onResult: (Boolean, String?) -> Unit) {

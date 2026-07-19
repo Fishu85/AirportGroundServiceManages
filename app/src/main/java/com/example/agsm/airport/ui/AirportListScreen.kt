@@ -14,6 +14,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,11 +25,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.agsm.airport.Airport
 import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
 import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
+import com.example.agsm.ui.theme.TertiaryForeground
 import com.example.agsm.ui.theme.White
 import com.example.agsm.user.Role
 import com.example.agsm.user.UserViewModel
@@ -40,6 +43,14 @@ fun AirportListScreen(
 ) {
     var showCreateAirportDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val airportId = userVm.user?.airportId
+
+    LaunchedEffect(airportId) {
+        if (airportId != null) {
+            airportVm.getAirport(airportId)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -74,6 +85,32 @@ fun AirportListScreen(
                         fontWeight = FontWeight.Bold,
                         color = White,
                         fontSize = 24.sp)
+                }
+            } else if (userVm.user?.airportId == null && userVm.user?.role == Role.RAMP_SUPERVISOR) {
+                Text("You are not assigned to any airport.",
+                    color = White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp)
+            } else {
+                val airport = airportVm.airport
+
+                if (airport != null) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(airport.airportName,
+                            color = White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp)
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text("${airport.icao}/${airport.iata}",
+                            color = White,
+                            fontSize = 16.sp)
+                    }
                 }
             }
         }
