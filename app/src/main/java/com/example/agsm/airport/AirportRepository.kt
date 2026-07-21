@@ -59,4 +59,30 @@ class AirportRepository (
                 onResult(false, e.message)
             }
     }
+
+    fun updateAirport(
+        airportId: String,
+        icao: String,
+        iata: String,
+        airportName: String,
+        joinCode: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val updates = mapOf(
+            "icao" to icao,
+            "iata" to iata,
+            "airportName" to airportName,
+            "joinCode" to joinCode
+        )
+
+        db.collection("airports")
+            .document(airportId)
+            .update(updates)
+            .addOnSuccessListener {
+                onResult(true, "Airport updated")
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.agsm.airport.ui
 
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,9 +29,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.agsm.R
 import com.example.agsm.airport.AirportViewModel
-import com.example.agsm.ui.theme.Green
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
 import com.example.agsm.ui.theme.SecondaryForeground
@@ -54,6 +53,8 @@ fun AirportDetailsScreen(
     }
 
     var isJoinCodeVisible by remember { mutableStateOf(false) }
+    var showEditAirportDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -182,7 +183,7 @@ fun AirportDetailsScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Button(
-                            onClick = { },
+                            onClick = { showEditAirportDialog = true },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = SecondaryForeground,
                                 contentColor = White
@@ -237,6 +238,35 @@ fun AirportDetailsScreen(
                     }
                 }
             }
+        }
+    }
+
+    if (showEditAirportDialog) {
+        val airport = airportVm.airport
+        Dialog(onDismissRequest = { showEditAirportDialog = false } ) {
+            EditAirportDialog(
+                currentAirportName = airport?.airportName ?: "",
+                currentIcao = airport?.icao ?: "",
+                currentIata = airport?.iata ?: "",
+                currentJoinCode = airport?.joinCode ?: "",
+                onConfirm = { airportName, icao, iata, joinCode ->
+                    airportVm.updateAirport(
+                        airportId = airport!!.airportId,
+                        airportName = airportName,
+                        icao = icao,
+                        iata = iata,
+                        joinCode = joinCode
+                    ) { ok, msg ->
+                        if (ok) {
+                            errorMessage = null
+                            showEditAirportDialog = false
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = { showEditAirportDialog = false }
+            )
         }
     }
 }

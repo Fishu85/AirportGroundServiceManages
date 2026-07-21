@@ -1,5 +1,6 @@
 package com.example.agsm.airport
 
+import androidx.collection.objectFloatMap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -73,6 +74,37 @@ class AirportViewModel (
     ) {
         airportRepo.getAirport(airportId) { loadedAirport ->
             airport = loadedAirport
+        }
+    }
+
+    fun updateAirport(
+        airportId: String,
+        icao: String,
+        iata: String,
+        airportName: String,
+        joinCode: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        airportRepo.updateAirport(
+            airportId = airportId,
+            icao = icao,
+            iata = iata,
+            airportName = airportName,
+            joinCode = joinCode
+        ) { ok, msg ->
+            if (ok) {
+                airport = airport?.copy(
+                    icao = icao,
+                    iata = iata,
+                    airportName = airportName,
+                    joinCode = joinCode
+                )
+                error = null
+                onResult(true, msg)
+            } else {
+                error = msg
+                onResult(false, msg)
+            }
         }
     }
 }
