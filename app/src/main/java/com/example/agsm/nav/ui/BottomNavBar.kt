@@ -41,7 +41,7 @@ fun BottomNavBar(
 
         NavigationBarItem(
             selected = false,
-            onClick = { },
+            onClick = { nav.navigate("airport_details")},
             icon = {Image(
                 painter = painterResource(R.drawable.baseline_home_24),
                 contentDescription = "Home airport",

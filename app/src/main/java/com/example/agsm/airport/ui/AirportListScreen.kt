@@ -1,7 +1,6 @@
 package com.example.agsm.airport.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,13 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.agsm.airport.Airport
 import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
-import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
-import com.example.agsm.ui.theme.TertiaryForeground
 import com.example.agsm.ui.theme.White
 import com.example.agsm.user.Role
 import com.example.agsm.user.UserViewModel

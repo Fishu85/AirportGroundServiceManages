@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.agsm.airport.AirportViewModel
+import com.example.agsm.airport.ui.AirportDetailsScreen
 import com.example.agsm.airport.ui.AirportListScreen
 import com.example.agsm.auth.AuthViewModel
 import com.example.agsm.auth.AuthViewModelFactory
@@ -127,6 +128,13 @@ fun AppNavHost() {
 
             composable("airport_list") {
                 AirportListScreen(
+                    userVm = userVm,
+                    airportVm = airportVm
+                )
+            }
+
+            composable("airport_details") {
+                AirportDetailsScreen(
                     userVm = userVm,
                     airportVm = airportVm
                 )
