@@ -55,6 +55,7 @@ fun AirportDetailsScreen(
     var isJoinCodeVisible by remember { mutableStateOf(false) }
     var showEditAirportDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -211,7 +212,7 @@ fun AirportDetailsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
 
                         Button(
-                            onClick = { },
+                            onClick = { showDeleteDialog = true },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Red,
                                 contentColor = White
@@ -266,6 +267,32 @@ fun AirportDetailsScreen(
                     }
                 },
                 onDismiss = { showEditAirportDialog = false }
+            )
+        }
+    }
+
+    if (showDeleteDialog) {
+        val airport = airportVm.airport
+        Dialog(onDismissRequest = {showDeleteDialog = false}) {
+            DeleteAirportDialog(
+                onConfirm = { password ->
+                    airportVm.deleteAirport(
+                        airportId = airport!!.airportId,
+                        password = password,
+                        user = userVm.user!!
+                    ) { ok, msg ->
+                        if (ok) {
+                            errorMessage = null
+                            showDeleteDialog = false
+                            userVm.updateUserAirportId(null)
+                            userVm.loadUser()
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = { showDeleteDialog = false },
+                errorMessage = errorMessage
             )
         }
     }

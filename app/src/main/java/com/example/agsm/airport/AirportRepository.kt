@@ -48,7 +48,7 @@ class AirportRepository (
         }
     }
 
-    fun assignAirportToUser(userId: String, airportId: String, onResult: (Boolean, String?) -> Unit) {
+    fun assignAirportToUser(userId: String, airportId: String?, onResult: (Boolean, String?) -> Unit) {
         db.collection("users")
             .document(userId)
             .update("airportId", airportId)
@@ -80,6 +80,21 @@ class AirportRepository (
             .update(updates)
             .addOnSuccessListener {
                 onResult(true, "Airport updated")
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
+
+    fun deleteAirport(
+        airportId: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        db.collection("airports")
+            .document(airportId)
+            .delete()
+            .addOnSuccessListener {
+                onResult(true, "airport deleted")
             }
             .addOnFailureListener { e ->
                 onResult(false, e.message)

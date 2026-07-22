@@ -1,11 +1,12 @@
 package com.example.agsm.airport
 
-import androidx.collection.objectFloatMap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.agsm.user.User
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
 
 class AirportViewModel (
     private val airportRepo: AirportRepository = AirportRepository()
@@ -106,5 +107,38 @@ class AirportViewModel (
                 onResult(false, msg)
             }
         }
+    }
+
+    fun deleteAirport(
+        airportId: String,
+        password: String,
+        user: User,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val auth = FirebaseAuth.getInstance()
+        val email = user.email
+
+        if (email == null) {
+            onResult(false, "User email not found")
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(email, password)
+
+        auth.currentUser?.reauthenticate(credential)
+            ?.addOnSuccessListener {
+                airportRepo.deleteAirport(airportId) { ok, msg ->
+                    if (ok) {
+                        airportRepo.assignAirportToUser(user.uid, null) { _, _ -> }
+                        airport = null
+                        onResult(true, "Airport deleted")
+                    } else {
+                        onResult(false, msg)
+                    }
+                }
+            }
+            ?.addOnFailureListener { e ->
+                onResult(false, "Wrong password")
+            }
     }
 }
