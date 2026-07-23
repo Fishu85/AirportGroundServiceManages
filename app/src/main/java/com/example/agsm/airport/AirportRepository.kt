@@ -100,4 +100,15 @@ class AirportRepository (
                 onResult(false, e.message)
             }
     }
+
+    fun getAllAirports(
+        onResult: (List<Airport>) -> Unit
+    ) {
+        db.collection("airports")
+            .get()
+            .addOnSuccessListener { snap ->
+                val airports = snap.documents.mapNotNull { it.toObject(Airport::class.java) }
+                onResult(airports)
+            }
+    }
 }

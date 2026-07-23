@@ -14,6 +14,8 @@ class AirportViewModel (
     var airport by mutableStateOf<Airport?>(null)
         private set
     var error by mutableStateOf<String?>(null)
+    var airports by mutableStateOf<List<Airport>>(emptyList())
+        private set
 
     fun createAirport(
         icao: String,
@@ -140,5 +142,11 @@ class AirportViewModel (
             ?.addOnFailureListener { e ->
                 onResult(false, "Wrong password")
             }
+    }
+
+    fun loadAllAirports() {
+        airportRepo.getAllAirports { list ->
+            airports = list
+        }
     }
 }
