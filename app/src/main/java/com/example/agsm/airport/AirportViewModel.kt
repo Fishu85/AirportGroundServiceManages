@@ -120,26 +120,27 @@ class AirportViewModel (
         val auth = FirebaseAuth.getInstance()
         val email = user.email
 
-        if (email == null) {
-            onResult(false, "User email not found")
-            return
-        }
-
         val credential = EmailAuthProvider.getCredential(email, password)
 
         auth.currentUser?.reauthenticate(credential)
             ?.addOnSuccessListener {
-                airportRepo.deleteAirport(airportId) { ok, msg ->
-                    if (ok) {
-                        airportRepo.assignAirportToUser(user.uid, null) { _, _ -> }
-                        airport = null
-                        onResult(true, "Airport deleted")
-                    } else {
-                        onResult(false, msg)
+                airportRepo.clearAirportIdForAllUsers(airportId) { clearedOk ->
+                    if (!clearedOk) {
+                        onResult(false, "Failed to clear airportId for users")
+                        return@clearAirportIdForAllUsers
+                    }
+                    airportRepo.deleteAirport(airportId) { ok, msg ->
+                        if (ok) {
+                            airportRepo.assignAirportToUser(user.uid, null) { _, _ -> }
+                            airport = null
+                            onResult(true, "Airport deleted")
+                        } else {
+                            onResult(false, msg)
+                        }
                     }
                 }
             }
-            ?.addOnFailureListener { e ->
+            ?.addOnFailureListener {
                 onResult(false, "Wrong password")
             }
     }
@@ -147,6 +148,26 @@ class AirportViewModel (
     fun loadAllAirports() {
         airportRepo.getAllAirports { list ->
             airports = list
+        }
+    }
+
+    fun joinAirport(
+        airport: Airport,
+        joinCode: String,
+        user: User,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        if (joinCode != airport.joinCode) {
+            onResult(false, "Invalid join code")
+            return
+        }
+
+        airportRepo.assignAirportToUser(user.uid, airport.airportId) { ok, msg ->
+            if (ok) {
+                onResult(true, null)
+            } else {
+                onResult(false, msg)
+            }
         }
     }
 }

@@ -24,7 +24,8 @@ import com.example.agsm.user.UserViewModel
 @Composable
 fun AirportTile(
     airport: Airport,
-    userVm: UserViewModel
+    userVm: UserViewModel,
+    onJoinClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -57,7 +58,7 @@ fun AirportTile(
         ) {
             if (userVm.user?.airportId == null && userVm.user?.role == Role.RAMP_SUPERVISOR){
                 Button(
-                    onClick = { },
+                    onClick = { onJoinClick() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SecondaryForeground,
                         contentColor = White

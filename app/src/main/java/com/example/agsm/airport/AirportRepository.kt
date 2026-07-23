@@ -111,4 +111,37 @@ class AirportRepository (
                 onResult(airports)
             }
     }
+
+    fun clearAirportIdForAllUsers(
+        airportId: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        db.collection("users")
+            .whereEqualTo("airportId", airportId)
+            .get()
+            .addOnSuccessListener { snap ->
+                if (snap.isEmpty) {
+                    onResult(true)
+                    return@addOnSuccessListener
+                }
+
+                var successCount = 0
+                var failureCount = 0
+                val total = snap.size()
+
+                snap.documents.forEach { doc ->
+                    val userId = doc.getString("uid") ?: doc.id
+                    assignAirportToUser(userId, null) { ok, _ ->
+                        if (ok) successCount++ else failureCount++
+
+                        if (successCount + failureCount == total) {
+                            onResult(failureCount == 0)
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener {
+                onResult(false)
+            }
+    }
 }

@@ -32,8 +32,8 @@ import com.example.agsm.ui.theme.White
 import com.example.agsm.user.Role
 import com.example.agsm.user.UserViewModel
 import androidx.compose.foundation.lazy.items
+import com.example.agsm.airport.Airport
 import com.example.agsm.ui.theme.SecondaryBackground
-import java.nio.file.WatchEvent
 
 @Composable
 fun AirportListScreen(
@@ -53,9 +53,14 @@ fun AirportListScreen(
 
     LaunchedEffect(Unit) {
         airportVm.loadAllAirports()
+        userVm.loadUser()
     }
 
     val airports = airportVm.airports
+
+    var showJoinDialog by remember { mutableStateOf(false) }
+    var selectedAirport by remember { mutableStateOf<Airport?>(null) }
+    var joinError by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -142,7 +147,10 @@ fun AirportListScreen(
                     .background(SecondaryBackground, RoundedCornerShape(16.dp))
             ) {
                 items(airports) { airport ->
-                    AirportTile(airport, userVm)
+                    AirportTile(airport, userVm) {
+                        selectedAirport = airport
+                        showJoinDialog = true
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -174,6 +182,28 @@ fun AirportListScreen(
                     showCreateAirportDialog = false
                 },
                 errorMessage = errorMessage
+            )
+        }
+    }
+
+    if (showJoinDialog && selectedAirport != null) {
+        Dialog(onDismissRequest = { showJoinDialog = false }) {
+            JoinAirportDialog(
+                onConfirm = { joinCode ->
+                    airportVm.joinAirport(selectedAirport!!, joinCode, userVm.user!!) { ok, msg ->
+                        if (ok) {
+                            joinError = null
+                            showJoinDialog = false
+                            userVm.updateUserAirportId(selectedAirport!!.airportId)
+                            userVm.loadUser()
+                        } else {
+                            joinError = msg
+                        }
+                    }
+                },
+                onDismiss = { showJoinDialog = false },
+                errorMessage = joinError,
+                airportVm = airportVm
             )
         }
     }
