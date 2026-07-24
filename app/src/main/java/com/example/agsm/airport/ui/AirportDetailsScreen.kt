@@ -35,6 +35,7 @@ import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
 import com.example.agsm.ui.theme.SecondaryForeground
+import com.example.agsm.ui.theme.SecondaryText
 import com.example.agsm.ui.theme.White
 import com.example.agsm.user.Role
 import com.example.agsm.user.UserViewModel
@@ -57,190 +58,206 @@ fun AirportDetailsScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PrimaryBackground)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    if (userVm.user?.airportId != null) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(PrimaryForeground, RoundedCornerShape(16.dp))
+                .fillMaxSize()
+                .background(PrimaryBackground)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Airport details",
-                color = White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
-
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.Start
+                    .fillMaxWidth()
+                    .background(PrimaryForeground, RoundedCornerShape(16.dp))
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val airport = airportVm.airport
+                Text("Airport details",
+                    color = White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
 
-                Row(
+                Column(
                     modifier = Modifier
-                        .padding(top = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Text("Name: ",
-                        color = White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+                    val airport = airportVm.airport
 
-                    Text(airport?.airportName ?: "",
-                        color = White,
-                        fontSize = 16.sp)
-                }
-
-                Row(
-                    modifier = Modifier
-                        .padding(top = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("ICAO: ",
-                        color = White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-
-                    Text(airport?.icao ?: "",
-                        color = White,
-                        fontSize = 16.sp)
-                }
-
-                Row(
-                    modifier = Modifier
-                        .padding(top = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("IATA: ",
-                        color = White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp)
-
-                    Text(airport?.iata ?: "",
-                        color = White,
-                        fontSize = 16.sp)
-                }
-
-                if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
                     Row(
                         modifier = Modifier
                             .padding(top = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Join code: ",
+                        Text("Name: ",
                             color = White,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+
+                        Text(airport?.airportName ?: "",
+                            color = White,
                             fontSize = 16.sp)
-
-                        if (isJoinCodeVisible) {
-                            Text(airport?.joinCode ?: "",
-                                color = White,
-                                fontSize = 16.sp)
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Image(
-                                painter = painterResource(R.drawable.outline_visibility_24),
-                                contentDescription = "join code visibility: visible",
-                                colorFilter = ColorFilter.tint(White),
-                                modifier = Modifier
-                                    .clickable{
-                                        isJoinCodeVisible = false
-                                    }
-                            )
-                        } else {
-                            Text("********************",
-                                color = White,
-                                fontSize = 16.sp)
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Image(
-                                painter = painterResource(R.drawable.outline_visibility_off_24),
-                                contentDescription = "Join code visibility: hidden",
-                                colorFilter = ColorFilter.tint(White),
-                                modifier = Modifier
-                                    .clickable{
-                                        isJoinCodeVisible = true
-                                    }
-                            )
-                        }
                     }
 
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.Center
+                            .padding(top = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Button(
-                            onClick = { showEditAirportDialog = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = SecondaryForeground,
-                                contentColor = White
-                            ),
+                        Text("ICAO: ",
+                            color = White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+
+                        Text(airport?.icao ?: "",
+                            color = White,
+                            fontSize = 16.sp)
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("IATA: ",
+                            color = White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp)
+
+                        Text(airport?.iata ?: "",
+                            color = White,
+                            fontSize = 16.sp)
+                    }
+
+                    if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
+                                .padding(top = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.baseline_edit_24),
-                                    contentDescription = "Edit airport",
-                                    colorFilter = ColorFilter.tint(White)
-                                )
+                            Text("Join code: ",
+                                color = White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp)
+
+                            if (isJoinCodeVisible) {
+                                Text(airport?.joinCode ?: "",
+                                    color = White,
+                                    fontSize = 16.sp)
 
                                 Spacer(modifier = Modifier.width(8.dp))
 
-                                Text("Edit",
+                                Image(
+                                    painter = painterResource(R.drawable.outline_visibility_24),
+                                    contentDescription = "join code visibility: visible",
+                                    colorFilter = ColorFilter.tint(White),
+                                    modifier = Modifier
+                                        .clickable{
+                                            isJoinCodeVisible = false
+                                        }
+                                )
+                            } else {
+                                Text("********************",
                                     color = White,
-                                    fontWeight = FontWeight.Bold)
+                                    fontSize = 16.sp)
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Image(
+                                    painter = painterResource(R.drawable.outline_visibility_off_24),
+                                    contentDescription = "Join code visibility: hidden",
+                                    colorFilter = ColorFilter.tint(White),
+                                    modifier = Modifier
+                                        .clickable{
+                                            isJoinCodeVisible = true
+                                        }
+                                )
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Button(
-                            onClick = { showDeleteDialog = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red,
-                                contentColor = White
-                            ),
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
+                            Button(
+                                onClick = { showEditAirportDialog = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = SecondaryForeground,
+                                    contentColor = White
+                                ),
+                                modifier = Modifier
+                                    .weight(1f)
                             ) {
-                                Image(
-                                    painter = painterResource(R.drawable.outline_delete_24),
-                                    contentDescription = "Delete airport",
-                                    colorFilter = ColorFilter.tint(White)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.baseline_edit_24),
+                                        contentDescription = "Edit airport",
+                                        colorFilter = ColorFilter.tint(White)
+                                    )
 
-                                Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
 
-                                Text("Delete",
-                                    color = White,
-                                    fontWeight = FontWeight.Bold)
+                                    Text("Edit",
+                                        color = White,
+                                        fontWeight = FontWeight.Bold)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Button(
+                                onClick = { showDeleteDialog = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red,
+                                    contentColor = White
+                                ),
+                                modifier = Modifier
+                                    .weight(1f)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.outline_delete_24),
+                                        contentDescription = "Delete airport",
+                                        colorFilter = ColorFilter.tint(White)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text("Delete",
+                                        color = White,
+                                        fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(PrimaryBackground),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("You are not part of any airport.",
+                color = SecondaryText,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
+
 
     if (showEditAirportDialog) {
         val airport = airportVm.airport
