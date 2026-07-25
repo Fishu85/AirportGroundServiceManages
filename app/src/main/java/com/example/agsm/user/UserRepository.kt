@@ -124,4 +124,31 @@ class UserRepository(
                     }
             }
     }
+
+    fun getAllUsers(
+        onResult: (List<User>) -> Unit
+    ) {
+        db.collection("users")
+            .get()
+            .addOnSuccessListener { snap ->
+                val users = snap.documents.mapNotNull { it.toObject(User::class.java) }
+                onResult(users)
+            }
+    }
+
+    fun assignAirportToUser(
+        uid: String,
+        airportId: String?,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        db.collection("users")
+            .document(uid)
+            .update("airportId", airportId)
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }

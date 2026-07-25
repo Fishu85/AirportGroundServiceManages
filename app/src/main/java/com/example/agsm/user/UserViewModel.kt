@@ -15,6 +15,8 @@ class UserViewModel(
 
     var error by mutableStateOf<String?>(null)
 
+    var users by mutableStateOf<List<User>>(emptyList())
+
     fun loadUser() {
         val uid = authRepo.currentUser()?.uid ?: return
 
@@ -63,5 +65,18 @@ class UserViewModel(
 
     fun updateUserAirportId(airportId: String?) {
         user = user?.copy(airportId = airportId)
+    }
+
+    fun loadAllUsers() {
+        userRepo.getAllUsers { list ->
+            users = list
+        }
+    }
+
+    fun updateUserAirportIdFor(
+        uid: String,
+        airportId: String?
+    ) {
+        userRepo.assignAirportToUser(uid, airportId) {_, _ -> }
     }
 }

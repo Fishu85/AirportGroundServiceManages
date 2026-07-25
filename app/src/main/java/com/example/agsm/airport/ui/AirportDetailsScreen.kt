@@ -1,5 +1,6 @@
 package com.example.agsm.airport.ui
 
+import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,8 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,11 +38,15 @@ import com.example.agsm.R
 import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
+import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.SecondaryForeground
 import com.example.agsm.ui.theme.SecondaryText
 import com.example.agsm.ui.theme.White
 import com.example.agsm.user.Role
+import com.example.agsm.user.User
 import com.example.agsm.user.UserViewModel
+import com.example.agsm.user.ui.KickUserDialog
+import com.example.agsm.user.ui.UserTile
 
 @Composable
 fun AirportDetailsScreen(
@@ -53,10 +61,19 @@ fun AirportDetailsScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        userVm.loadAllUsers()
+    }
+
+    val users = userVm.users.filter { it.airportId == airportVm.airport?.airportId && it.role == Role.RAMP_SUPERVISOR }
+
     var isJoinCodeVisible by remember { mutableStateOf(false) }
     var showEditAirportDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var selectedUser by remember { mutableStateOf<User?>(null) }
+    var showKickDialog by remember { mutableStateOf(false) }
+    var userToKick by remember { mutableStateOf<User?>(null) }
 
     if (userVm.user?.airportId != null) {
         Column(
@@ -242,6 +259,58 @@ fun AirportDetailsScreen(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(PrimaryForeground, RoundedCornerShape(16.dp))
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Employees",
+                    color = White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Operations manager",
+                    color = White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(airportVm.airport?.manager?.name ?: "",
+                        color = White)
+                }
+
+                Text("Ramp supervisors",
+                    color = White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(SecondaryBackground, RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    items(users) { user ->
+                        UserTile(user, userVm) {
+                            userToKick = user
+                            showKickDialog = true
+                        }
+                    }
+                }
+            }
         }
     } else {
         Column(
@@ -310,6 +379,22 @@ fun AirportDetailsScreen(
                 },
                 onDismiss = { showDeleteDialog = false },
                 errorMessage = errorMessage
+            )
+        }
+    }
+
+    if (showKickDialog) {
+        Dialog(onDismissRequest = { showKickDialog = false}) {
+            KickUserDialog(
+                userName = userToKick!!.name,
+                onConfirm = {
+                    userVm.updateUserAirportIdFor(userToKick!!.uid, null)
+                    userVm.loadAllUsers()
+                    showKickDialog = false
+                },
+                onDismiss = {
+                    showKickDialog = false
+                }
             )
         }
     }
