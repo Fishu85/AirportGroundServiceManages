@@ -1,5 +1,6 @@
 package com.example.agsm.airport
 
+import com.example.agsm.apron.Apron
 import com.example.agsm.user.User
 
 data class Airport (
@@ -8,5 +9,6 @@ data class Airport (
     val iata: String = "",
     val airportName: String = "",
     val joinCode: String = "",
-    val manager: User? = null
+    val manager: User? = null,
+    val aprons: List<Apron> = emptyList()
 )

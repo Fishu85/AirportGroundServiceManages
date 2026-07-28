@@ -13,6 +13,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.airport.ui.AirportDetailsScreen
 import com.example.agsm.airport.ui.AirportListScreen
+import com.example.agsm.airport.ui.AirportOperationsScreen
+import com.example.agsm.apron.ApronViewModel
 import com.example.agsm.auth.AuthViewModel
 import com.example.agsm.auth.AuthViewModelFactory
 import com.example.agsm.auth.ui.LoginScreen
@@ -38,6 +40,7 @@ fun AppNavHost() {
     val authVm: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
     val userVm: UserViewModel = viewModel()
     val airportVm: AirportViewModel = viewModel()
+    val apronVm: ApronViewModel = viewModel()
 
     authVm.onUserLoggedIn = {
         userVm.loadUser()
@@ -137,6 +140,14 @@ fun AppNavHost() {
                 AirportDetailsScreen(
                     userVm = userVm,
                     airportVm = airportVm
+                )
+            }
+
+            composable("airport_operations") {
+                AirportOperationsScreen(
+                    userVm = userVm,
+                    airportVm = airportVm,
+                    apronVm = apronVm
                 )
             }
         }

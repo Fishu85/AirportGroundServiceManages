@@ -7,7 +7,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 class UserRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
-    fun createUser(user: User, onResult: (Boolean, String?) -> Unit = {_, _ ->}) {
+    fun createUser(
+        user: User,
+        onResult: (Boolean, String?) -> Unit = {_, _ ->}
+    ) {
         db.collection("users")
             .document(user.uid)
             .set(user)
