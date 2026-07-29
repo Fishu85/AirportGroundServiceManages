@@ -47,4 +47,17 @@ class ApronRepository(
                 }
         }
     }
+
+    fun getApronsForAirport(
+        airportId: String,
+        onResult: (List<Apron>) -> Unit
+    ) {
+        db.collection("aprons")
+            .whereEqualTo("airport.airportId", airportId)
+            .get()
+            .addOnSuccessListener { snap ->
+                val list = snap.documents.mapNotNull { it.toObject(Apron::class.java) }
+                onResult(list)
+            }
+    }
 }

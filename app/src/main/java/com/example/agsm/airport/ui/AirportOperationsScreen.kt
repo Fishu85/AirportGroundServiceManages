@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.apron.ApronViewModel
+import com.example.agsm.apron.ui.ApronTile
 import com.example.agsm.apron.ui.CreateApronDialog
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
@@ -47,6 +49,7 @@ fun AirportOperationsScreen(
     val airportId = userVm.user?.airportId
     var showCreateApronDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val aprons = apronVm.aprons.filter { it.airport.airportId == airportVm.airport?.airportId }
 
     LaunchedEffect(airportId) {
         if (airportId != null) {
@@ -57,6 +60,12 @@ fun AirportOperationsScreen(
     LaunchedEffect(Unit) {
         airportVm.loadAllAirports()
         userVm.loadUser()
+    }
+
+    LaunchedEffect(airportVm.airport?.airportId) {
+        airportVm.airport?.airportId?.let { id ->
+            apronVm.loadApronsForAirport(id)
+        }
     }
 
     if (userVm.user?.airportId != null) {
@@ -116,12 +125,13 @@ fun AirportOperationsScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
                 LazyColumn(
-
+                    modifier = Modifier
+                        .fillMaxSize()
                 ) {
-
+                    items(aprons) { apron ->
+                        ApronTile(apron)
+                    }
                 }
             }
         }

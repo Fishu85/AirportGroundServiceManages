@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.example.agsm.R
 import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.ui.theme.Green
-import com.example.agsm.ui.theme.PrimaryBackground
+import com.example.agsm.ui.theme.PrimaryForeground
 import com.example.agsm.ui.theme.White
 
 @Composable
@@ -37,7 +37,7 @@ fun LeaveAirportDialog(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(PrimaryBackground, RoundedCornerShape(16.dp))
+            .background(PrimaryForeground, RoundedCornerShape(16.dp))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -52,7 +52,6 @@ fun LeaveAirportDialog(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
         ) {
             Button(
                 onClick = { onConfirm() },

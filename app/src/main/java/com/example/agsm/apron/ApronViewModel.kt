@@ -12,6 +12,7 @@ class ApronViewModel(
     var error by mutableStateOf<String?>(null)
     var apron by mutableStateOf<Apron?>(null)
         private set
+    var aprons by mutableStateOf<List<Apron>>(emptyList())
 
     fun createApron(
         airportVm: AirportViewModel,
@@ -52,6 +53,14 @@ class ApronViewModel(
                     onResult(false, assignMsg)
                 }
             }
+        }
+    }
+
+    fun loadApronsForAirport(
+        airportId: String
+    ) {
+        apronRepo.getApronsForAirport(airportId) { list ->
+            aprons = list
         }
     }
 }

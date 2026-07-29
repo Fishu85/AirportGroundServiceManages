@@ -24,20 +24,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agsm.R
-import com.example.agsm.apron.ApronViewModel
-import com.example.agsm.ui.theme.SecondaryForeground
+import com.example.agsm.apron.Apron
+import com.example.agsm.ui.theme.SecondaryBackground
 import com.example.agsm.ui.theme.White
 
 @Composable
 fun ApronTile(
-    apronVm: ApronViewModel
+    apron: Apron
 ) {
     var isApronTileExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SecondaryForeground, RoundedCornerShape(16.dp))
+            .padding(top = 16.dp)
+            .background(SecondaryBackground, RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
         Row(
@@ -48,7 +49,7 @@ fun ApronTile(
                     .weight(7f),
                 horizontalAlignment = Alignment.Start
             ) {
-                Text(apronVm.apron?.apronNumber ?: "",
+                Text(apron.apronNumber,
                     color = White,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
