@@ -171,7 +171,11 @@ fun AirportListScreen(
                         if (ok) {
                             errorMessage = null
                             showCreateAirportDialog = false
-                            userVm.updateUserAirportId(airportVm.airport?.airportId)
+                            userVm.updateUserAirportId(airportVm.airport?.airportId) { ok ->
+                                if (ok) {
+                                    showCreateAirportDialog = false
+                                }
+                            }
                         } else {
                             errorMessage = msg
                         }
@@ -194,7 +198,11 @@ fun AirportListScreen(
                         if (ok) {
                             joinError = null
                             showJoinDialog = false
-                            userVm.updateUserAirportId(selectedAirport!!.airportId)
+                            userVm.updateUserAirportId(selectedAirport!!.airportId) { ok ->
+                                if (ok) {
+                                    showJoinDialog = false
+                                }
+                            }
                             userVm.loadUser()
                         } else {
                             joinError = msg

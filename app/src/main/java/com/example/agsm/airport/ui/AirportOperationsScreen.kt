@@ -1,6 +1,7 @@
 package com.example.agsm.airport.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -58,69 +59,84 @@ fun AirportOperationsScreen(
         userVm.loadUser()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PrimaryBackground)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    if (userVm.user?.airportId != null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(PrimaryForeground, RoundedCornerShape(16.dp))
-                .padding(16.dp)
+                .background(PrimaryBackground)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .background(PrimaryForeground, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
             ) {
-                Column(
+                Row(
                     modifier = Modifier
-                        .weight(7f),
-                    horizontalAlignment = Alignment.Start
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(airportVm.airport?.airportName ?: "",
-                        color = White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                    Column(
+                        modifier = Modifier
+                            .weight(7f),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(airportVm.airport?.airportName ?: "",
+                            color = White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                Column(
-                    modifier = Modifier
-                        .weight(2f),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    if(userVm.user?.role == Role.OPERATIONS_MANAGER) {
-                        Button(
-                            onClick = { showCreateApronDialog = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = SecondaryForeground,
-                                contentColor = White
-                            )
-                        ) {
-                            Text(
-                                "+",
-                                color = White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp
-                            )
+                    Column(
+                        modifier = Modifier
+                            .weight(2f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        if(userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                            Button(
+                                onClick = { showCreateApronDialog = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = SecondaryForeground,
+                                    contentColor = White
+                                )
+                            ) {
+                                Text(
+                                    "+",
+                                    color = White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp
+                                )
+                            }
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LazyColumn(
+
+                ) {
+
+                }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(
-
-            ) {
-
-            }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(PrimaryBackground),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("You are not part of any airport.",
+                color = SecondaryText,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 

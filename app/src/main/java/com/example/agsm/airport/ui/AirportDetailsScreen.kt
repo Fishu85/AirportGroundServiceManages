@@ -74,6 +74,7 @@ fun AirportDetailsScreen(
     var selectedUser by remember { mutableStateOf<User?>(null) }
     var showKickDialog by remember { mutableStateOf(false) }
     var userToKick by remember { mutableStateOf<User?>(null) }
+    var showLeaveDialog by remember { mutableStateOf(false) }
 
     if (userVm.user?.airportId != null) {
         Column(
@@ -256,6 +257,36 @@ fun AirportDetailsScreen(
                                 }
                             }
                         }
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Button(
+                                onClick = { showLeaveDialog = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red,
+                                    contentColor = White
+                                )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.baseline_exit_to_app_24),
+                                        contentDescription = "Leave the airport",
+                                        colorFilter = ColorFilter.tint(White)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text("Leave",
+                                        color = White,
+                                        fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -370,7 +401,11 @@ fun AirportDetailsScreen(
                         if (ok) {
                             errorMessage = null
                             showDeleteDialog = false
-                            userVm.updateUserAirportId(null)
+                            userVm.updateUserAirportId(null) { ok ->
+                                if (ok) {
+                                    showDeleteDialog = false
+                                }
+                            }
                             userVm.loadUser()
                         } else {
                             errorMessage = msg
@@ -395,6 +430,24 @@ fun AirportDetailsScreen(
                 onDismiss = {
                     showKickDialog = false
                 }
+            )
+        }
+    }
+
+    if (showLeaveDialog) {
+        Dialog(onDismissRequest = {showLeaveDialog = false}) {
+            LeaveAirportDialog(
+                onConfirm = {
+                    userVm.updateUserAirportId(null) { ok ->
+                        if (ok) {
+                            showLeaveDialog = false
+                        }
+                    }
+                },
+                onDismiss = {
+                    showLeaveDialog = false
+                },
+                airportVm = airportVm
             )
         }
     }

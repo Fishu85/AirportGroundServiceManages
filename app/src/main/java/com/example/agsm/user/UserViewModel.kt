@@ -63,8 +63,20 @@ class UserViewModel(
         }
     }
 
-    fun updateUserAirportId(airportId: String?) {
-        user = user?.copy(airportId = airportId)
+    fun updateUserAirportId(
+        airportId: String?,
+        onResult: (Boolean) -> Unit
+    ) {
+        val user = user ?: return onResult(false)
+
+        userRepo.assignAirportToUser(user.uid, airportId) { ok, msg ->
+            if (ok) {
+                loadUser()
+                onResult(true)
+            } else {
+                onResult(false)
+            }
+        }
     }
 
     fun loadAllUsers() {
