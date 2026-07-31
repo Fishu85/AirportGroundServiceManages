@@ -47,6 +47,7 @@ class ApronViewModel(
             ) { assignOk, assignMsg ->
                 if (assignOk) {
                     airportVm.getAirport(airport.airportId)
+                    loadApronsForAirport(airportVm.airport!!.airportId)
                     onResult(true, msg)
                 } else {
                     error = assignMsg
@@ -62,5 +63,19 @@ class ApronViewModel(
         apronRepo.getApronsForAirport(airportId) { list ->
             aprons = list
         }
+    }
+
+    fun getApron(
+        apronId: String?
+    ) {
+        apronRepo.getApron(apronId) { loadedApron ->
+            apron = loadedApron
+        }
+    }
+
+    fun selectApron(
+        apron: Apron
+    ) {
+        this.apron = apron
     }
 }

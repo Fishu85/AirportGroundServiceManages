@@ -60,4 +60,18 @@ class ApronRepository(
                 onResult(list)
             }
     }
+
+    fun getApron(
+        apronId: String?,
+        onResult: (Apron?) -> Unit
+    ) {
+        if (apronId != null) {
+            db.collection("aprons")
+                .document(apronId)
+                .get()
+                .addOnSuccessListener { snap ->
+                    onResult(snap.toObject(Apron::class.java))
+                }
+        }
+    }
 }
