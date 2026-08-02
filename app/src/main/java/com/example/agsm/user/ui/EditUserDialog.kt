@@ -159,6 +159,8 @@ fun EditUserDialog(
                     }
                 }
 
+                Spacer(modifier = Modifier.width(16.dp))
+
                 Button(
                     onClick = {
                         onConfirm(name, email)
