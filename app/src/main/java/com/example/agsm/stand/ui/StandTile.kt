@@ -18,13 +18,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agsm.R
+import com.example.agsm.flight.AircraftCategory
 import com.example.agsm.stand.Stand
+import com.example.agsm.ui.theme.Green
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.White
 import com.example.agsm.user.UserViewModel
@@ -35,6 +38,15 @@ fun StandTile(
     userVm: UserViewModel
 ) {
     var isStandTileExpanded by remember { mutableStateOf(false) }
+
+    val categories = stand?.categories ?: emptyList()
+
+    var isAEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.A)) }
+    var isBEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.B)) }
+    var isCEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.C)) }
+    var isDEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.D)) }
+    var isEEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.E)) }
+    var isFEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.F)) }
 
     Column(
         modifier = Modifier
@@ -58,6 +70,103 @@ fun StandTile(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(2f)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    if (isAEnabled) {
+                        Text("A",
+                            color = Green,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text("A",
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    if (isBEnabled) {
+                        Text("B",
+                            color = Green,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text("B",
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    if (isCEnabled) {
+                        Text("C",
+                            color = Green,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text("C",
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    if (isDEnabled) {
+                        Text("D",
+                            color = Green,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text("D",
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    if (isEEnabled) {
+                        Text("E",
+                            color = Green,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text("E",
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    if (isFEnabled) {
+                        Text("F",
+                            color = Green,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text("F",
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))

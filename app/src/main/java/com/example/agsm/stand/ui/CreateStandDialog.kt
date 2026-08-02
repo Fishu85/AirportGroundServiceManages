@@ -97,8 +97,16 @@ fun CreateStandDialog(
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Text("Categories: ",
+                color = White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.width(16.dp))
+
             if (isASelected) {
                 Text("A",
                     fontSize = 24.sp,
