@@ -29,6 +29,7 @@ import com.example.agsm.R
 import com.example.agsm.apron.Apron
 import com.example.agsm.apron.ApronViewModel
 import com.example.agsm.flight.AircraftCategory
+import com.example.agsm.flight.FlightViewModel
 import com.example.agsm.stand.StandViewModel
 import com.example.agsm.stand.ui.CreateStandDialog
 import com.example.agsm.stand.ui.StandTile
@@ -42,7 +43,8 @@ fun ApronTile(
     apron: Apron,
     userVm: UserViewModel,
     standVm: StandViewModel,
-    apronVm: ApronViewModel
+    apronVm: ApronViewModel,
+    flightVm: FlightViewModel
 ) {
     var isApronTileExpanded by remember { mutableStateOf(false) }
     var showCreateStandDialog by remember { mutableStateOf(false) }
@@ -130,7 +132,7 @@ fun ApronTile(
                     .fillMaxWidth()
             ) {
                 stands.forEach { stand ->
-                    StandTile(stand, userVm)
+                    StandTile(stand, userVm, flightVm, standVm)
                 }
             }
         }

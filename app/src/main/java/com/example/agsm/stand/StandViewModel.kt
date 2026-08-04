@@ -46,7 +46,6 @@ class StandViewModel(
                 onResult(false, msg)
                 return@createStand
             }
-
             stand = createdStand
             error = null
             standRepo.addStandToApron(
@@ -79,5 +78,9 @@ class StandViewModel(
         standRepo.getStand(standId) { loadedStand ->
             stand = loadedStand
         }
+    }
+
+    fun updateStand(newStand: Stand?) {
+        stand = newStand
     }
 }

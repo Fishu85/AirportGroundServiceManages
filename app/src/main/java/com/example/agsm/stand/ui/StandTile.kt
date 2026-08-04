@@ -3,13 +3,17 @@ package com.example.agsm.stand.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,18 +28,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.agsm.R
 import com.example.agsm.flight.AircraftCategory
+import com.example.agsm.flight.AircraftPosition
+import com.example.agsm.flight.FlightViewModel
+import com.example.agsm.flight.ui.CreateFlightDialog
+import com.example.agsm.flight.ui.DropdownMenuAircraftPositionSelector
 import com.example.agsm.stand.Stand
+import com.example.agsm.stand.StandViewModel
 import com.example.agsm.ui.theme.Green
 import com.example.agsm.ui.theme.PrimaryBackground
+import com.example.agsm.ui.theme.SecondaryForeground
 import com.example.agsm.ui.theme.White
+import com.example.agsm.user.Role
 import com.example.agsm.user.UserViewModel
 
 @Composable
 fun StandTile(
     stand: Stand?,
-    userVm: UserViewModel
+    userVm: UserViewModel,
+    flightVm: FlightViewModel,
+    standVm: StandViewModel
 ) {
     var isStandTileExpanded by remember { mutableStateOf(false) }
 
@@ -47,6 +61,11 @@ fun StandTile(
     var isDEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.D)) }
     var isEEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.E)) }
     var isFEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.F)) }
+
+    var showAddFlightDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    var aircraftPosition by remember { mutableStateOf(AircraftPosition.ARRIVAL) }
 
     Column(
         modifier = Modifier
@@ -199,7 +218,145 @@ fun StandTile(
         }
 
         if (isStandTileExpanded) {
+            Spacer(modifier = Modifier.height(16.dp))
 
+            if (stand?.flight == null && userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = { showAddFlightDialog = true },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SecondaryForeground,
+                            contentColor = White
+                        )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("+",
+                                color = White,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold)
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text("Add flight",
+                                color = White,
+                                fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+
+            if(stand?.flight != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(stand.flight.aircraftModel,
+                            color = White,
+                            fontWeight = FontWeight.Bold)
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(stand.flight.airline,
+                            color = White,
+                            fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(stand.flight.registrationNumber,
+                            color = White,
+                            fontWeight = FontWeight.Bold)
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(stand.flight.flightNumber,
+                            color = White,
+                            fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    DropdownMenuAircraftPositionSelector(aircraftPosition) {
+                        aircraftPosition = it
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text("+",
+                        color = White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 32.sp,
+                        modifier = Modifier
+                            .clickable { }
+                    )
+                }
+            }
+        }
+    }
+
+    if (showAddFlightDialog) {
+        Dialog(onDismissRequest = {showAddFlightDialog = false}) {
+            CreateFlightDialog(
+                onConfirm = { aircraftModel, aircraftCategory, airline, registrationNumber, flightNumber ->
+                    standVm.updateStand(stand)
+                    flightVm.createFlight(
+                        standVm = standVm,
+                        aircraftModel = aircraftModel,
+                        aircraftCategory = aircraftCategory,
+                        airline = airline,
+                        registrationNumber = registrationNumber,
+                        flightNumber = flightNumber
+                    ) { ok, msg ->
+                        if (ok) {
+                            errorMessage = null
+                            showAddFlightDialog = false
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = {
+                    errorMessage = null
+                    showAddFlightDialog = false
+                },
+                errorMessage = errorMessage
+            )
         }
     }
 }

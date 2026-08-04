@@ -31,6 +31,7 @@ import com.example.agsm.airport.AirportViewModel
 import com.example.agsm.apron.ApronViewModel
 import com.example.agsm.apron.ui.ApronTile
 import com.example.agsm.apron.ui.CreateApronDialog
+import com.example.agsm.flight.FlightViewModel
 import com.example.agsm.stand.StandViewModel
 import com.example.agsm.ui.theme.PrimaryBackground
 import com.example.agsm.ui.theme.PrimaryForeground
@@ -45,7 +46,8 @@ fun AirportOperationsScreen(
     userVm: UserViewModel,
     airportVm: AirportViewModel,
     apronVm: ApronViewModel,
-    standVm: StandViewModel
+    standVm: StandViewModel,
+    flightVm: FlightViewModel
 ) {
     val airportId = userVm.user?.airportId
     var showCreateApronDialog by remember { mutableStateOf(false) }
@@ -133,7 +135,7 @@ fun AirportOperationsScreen(
                         .fillMaxSize()
                 ) {
                     items(aprons) { apron ->
-                        ApronTile(apron, userVm, standVm, apronVm)
+                        ApronTile(apron, userVm, standVm, apronVm, flightVm)
                     }
                 }
             }

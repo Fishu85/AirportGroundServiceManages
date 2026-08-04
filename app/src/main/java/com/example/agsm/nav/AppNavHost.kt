@@ -19,6 +19,7 @@ import com.example.agsm.auth.AuthViewModel
 import com.example.agsm.auth.AuthViewModelFactory
 import com.example.agsm.auth.ui.LoginScreen
 import com.example.agsm.auth.ui.RegisterScreen
+import com.example.agsm.flight.FlightViewModel
 import com.example.agsm.home.ui.HomeScreen
 import com.example.agsm.nav.ui.AppTopBar
 import com.example.agsm.nav.ui.BottomNavBar
@@ -43,6 +44,7 @@ fun AppNavHost() {
     val airportVm: AirportViewModel = viewModel()
     val apronVm: ApronViewModel = viewModel()
     val standVm: StandViewModel = viewModel()
+    val flightVm: FlightViewModel = viewModel()
 
     authVm.onUserLoggedIn = {
         userVm.loadUser()
@@ -150,7 +152,8 @@ fun AppNavHost() {
                     userVm = userVm,
                     airportVm = airportVm,
                     apronVm = apronVm,
-                    standVm = standVm
+                    standVm = standVm,
+                    flightVm = flightVm
                 )
             }
         }
