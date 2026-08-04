@@ -2,6 +2,7 @@ package com.example.agsm.stand
 
 import com.example.agsm.apron.Apron
 import com.example.agsm.flight.AircraftCategory
+import com.example.agsm.flight.AircraftPosition
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -76,5 +77,21 @@ class StandRepository(
                     onResult(snap.toObject(Stand::class.java))
                 }
         }
+    }
+
+    fun updateStandFlightPosition(
+        standId: String,
+        newPosition: AircraftPosition,
+        onResult: (Boolean) -> Unit
+    ) {
+        db.collection("stands")
+            .document(standId)
+            .update("flight.aircraftPosition", newPosition)
+            .addOnSuccessListener {
+                onResult(true)
+            }
+            .addOnFailureListener {
+                onResult(false)
+            }
     }
 }

@@ -82,5 +82,6 @@ class StandViewModel(
 
     fun updateStand(newStand: Stand?) {
         stand = newStand
+        stands = stands.map { if (it?.standId == newStand?.standId) newStand else it }
     }
 }

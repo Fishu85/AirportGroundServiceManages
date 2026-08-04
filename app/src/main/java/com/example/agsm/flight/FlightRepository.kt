@@ -24,7 +24,8 @@ class FlightRepository(
             airline = airline,
             registrationNumber = registrationNumber,
             flightNumber = flightNumber,
-            stand = stand
+            stand = stand,
+            aircraftPosition = AircraftPosition.ARRIVAL
         )
 
         docRef.set(flight)
@@ -82,5 +83,21 @@ class FlightRepository(
                     onResult(snap.toObject(Flight::class.java))
                 }
         }
+    }
+
+    fun updateFlightPosition(
+        flightId: String,
+        newPosition: AircraftPosition,
+        onResult: (Boolean) -> Unit
+    ) {
+        db.collection("flights")
+            .document(flightId)
+            .update("aircraftPosition", newPosition)
+            .addOnSuccessListener {
+                onResult(true)
+            }
+            .addOnFailureListener {
+                onResult(false)
+            }
     }
 }

@@ -65,7 +65,7 @@ fun StandTile(
     var showAddFlightDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    var aircraftPosition by remember { mutableStateOf(AircraftPosition.ARRIVAL) }
+    val aircraftPosition = stand?.flight?.aircraftPosition ?: AircraftPosition.ARRIVAL
 
     Column(
         modifier = Modifier
@@ -308,8 +308,8 @@ fun StandTile(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    DropdownMenuAircraftPositionSelector(aircraftPosition) {
-                        aircraftPosition = it
+                    DropdownMenuAircraftPositionSelector(aircraftPosition) { newPosition ->
+                        flightVm.updateFlightPositionForStand(standVm, stand, newPosition)
                     }
                 }
 

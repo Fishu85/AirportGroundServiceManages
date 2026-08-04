@@ -4,10 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.agsm.stand.Stand
+import com.example.agsm.stand.StandRepository
 import com.example.agsm.stand.StandViewModel
 
 class FlightViewModel(
-    private val flightRepo: FlightRepository = FlightRepository()
+    private val flightRepo: FlightRepository = FlightRepository(),
+    private val standRepo: StandRepository = StandRepository()
 ) : ViewModel() {
     var error by mutableStateOf<String?>(null)
     var flight by mutableStateOf<Flight?>(null)
@@ -78,6 +81,47 @@ class FlightViewModel(
     ) {
         flightRepo.getFlightForStand(standId) { loadedFlight ->
             flight = loadedFlight
+        }
+    }
+
+    fun updateFlightPosition(
+        standVm: StandViewModel,
+        newPosition: AircraftPosition
+    ) {
+        val currentFlight = flight ?: return
+        val stand = standVm.stand ?: return
+
+        flightRepo.updateFlightPosition(currentFlight.flightId, newPosition) { ok ->
+            if (ok) {
+                flight = currentFlight.copy(aircraftPosition = newPosition)
+                standRepo.updateStandFlightPosition(stand.standId, newPosition) { ok2 ->
+                    if (ok2) {
+                        standVm.updateStand(
+                            stand.copy(flight = currentFlight.copy(aircraftPosition = newPosition))
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateFlightPositionForStand(
+        standVm: StandViewModel,
+        stand: Stand?,
+        newPosition: AircraftPosition
+    ) {
+        val currentStand = stand ?: return
+        val currentFlight = currentStand.flight ?: return
+
+        flightRepo.updateFlightPosition(currentFlight.flightId, newPosition) { ok ->
+            if (ok) {
+                standRepo.updateStandFlightPosition(currentStand.standId, newPosition) { ok2 ->
+                    if (ok2) {
+                        standVm.getStand(currentStand.standId)
+                        standVm.loadStandsForApron(currentStand.apron.apronId)
+                    }
+                }
+            }
         }
     }
 }
