@@ -84,27 +84,6 @@ class FlightViewModel(
         }
     }
 
-    fun updateFlightPosition(
-        standVm: StandViewModel,
-        newPosition: AircraftPosition
-    ) {
-        val currentFlight = flight ?: return
-        val stand = standVm.stand ?: return
-
-        flightRepo.updateFlightPosition(currentFlight.flightId, newPosition) { ok ->
-            if (ok) {
-                flight = currentFlight.copy(aircraftPosition = newPosition)
-                standRepo.updateStandFlightPosition(stand.standId, newPosition) { ok2 ->
-                    if (ok2) {
-                        standVm.updateStand(
-                            stand.copy(flight = currentFlight.copy(aircraftPosition = newPosition))
-                        )
-                    }
-                }
-            }
-        }
-    }
-
     fun updateFlightPositionForStand(
         standVm: StandViewModel,
         stand: Stand?,
