@@ -3,8 +3,10 @@ package com.example.agsm.stand
 import com.example.agsm.apron.Apron
 import com.example.agsm.flight.AircraftCategory
 import com.example.agsm.flight.AircraftPosition
+import com.example.agsm.flight.Flight
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 
 class StandRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -60,8 +62,36 @@ class StandRepository(
             .whereEqualTo("apron.apronId", apronId)
             .get()
             .addOnSuccessListener { snap ->
-                val list = snap.documents.mapNotNull { it.toObject(Stand::class.java) }
-                onResult(list)
+                val stands = snap.documents.mapNotNull { it.toObject(Stand::class.java) }
+                if (stands.isEmpty()) {
+                    onResult(emptyList())
+                    return@addOnSuccessListener
+                }
+                val result = mutableListOf<Stand>()
+                var loadedCount = 0
+                stands.forEach { stand ->
+                    db.collection("flights")
+                        .whereEqualTo("stand.standId", stand.standId)
+                        .get()
+                        .addOnSuccessListener { flightSnap ->
+                            val flight = flightSnap.documents
+                                .firstOrNull()
+                                ?.toObject(Flight::class.java)
+                            val updatedStand = stand.copy(flight = flight)
+                            result.add(updatedStand)
+                            loadedCount++
+                            if (loadedCount == stands.size) {
+                                onResult(result)
+                            }
+                        }
+                        .addOnFailureListener {
+                            result.add(stand)
+                            loadedCount++
+                            if (loadedCount == stands.size) {
+                                onResult(result)
+                            }
+                        }
+                }
             }
     }
 

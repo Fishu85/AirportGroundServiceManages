@@ -1,6 +1,7 @@
 package com.example.agsm.flight
 
 import com.example.agsm.stand.Stand
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FlightRepository(
@@ -98,6 +99,22 @@ class FlightRepository(
             }
             .addOnFailureListener {
                 onResult(false)
+            }
+    }
+
+    fun addService(
+        flightId: String,
+        service: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        db.collection("flights")
+            .document(flightId)
+            .update("operations", FieldValue.arrayUnion(service))
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
             }
     }
 }

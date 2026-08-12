@@ -10,6 +10,6 @@ data class Flight(
     val registrationNumber: String = "",
     val flightNumber: String = "",
     val stand: Stand? = null,
-    val operations: List<Operations> = emptyList(),
+    val operations: List<String> = emptyList(),
     val aircraftPosition: AircraftPosition = AircraftPosition.ARRIVAL
 )

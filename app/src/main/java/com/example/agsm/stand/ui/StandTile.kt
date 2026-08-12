@@ -33,8 +33,10 @@ import com.example.agsm.R
 import com.example.agsm.flight.AircraftCategory
 import com.example.agsm.flight.AircraftPosition
 import com.example.agsm.flight.FlightViewModel
+import com.example.agsm.flight.ui.AddServiceDialog
 import com.example.agsm.flight.ui.CreateFlightDialog
 import com.example.agsm.flight.ui.DropdownMenuAircraftPositionSelector
+import com.example.agsm.flight.ui.OperationTile
 import com.example.agsm.stand.Stand
 import com.example.agsm.stand.StandViewModel
 import com.example.agsm.ui.theme.Green
@@ -63,6 +65,8 @@ fun StandTile(
     var isFEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.F)) }
 
     var showAddFlightDialog by remember { mutableStateOf(false) }
+    var showAddServiceDialog by remember { mutableStateOf(false) }
+
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val aircraftPosition = stand?.flight?.aircraftPosition ?: AircraftPosition.ARRIVAL
@@ -218,6 +222,7 @@ fun StandTile(
         }
 
         if (isStandTileExpanded) {
+            flightVm.loadFlightForStand(standVm, stand?.standId ?: "")
             Spacer(modifier = Modifier.height(16.dp))
 
             if (stand?.flight == null && userVm.user?.role == Role.OPERATIONS_MANAGER) {
@@ -313,18 +318,29 @@ fun StandTile(
                     }
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text("+",
-                        color = White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 32.sp,
+                if (aircraftPosition == AircraftPosition.ON_BLOCKS) {
+                    Column(
                         modifier = Modifier
-                            .clickable { }
-                    )
+                            .fillMaxWidth()
+                    ) {
+                        stand.flight.operations.forEach { service ->
+                            OperationTile(service)
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text("+",
+                            color = White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 32.sp,
+                            modifier = Modifier
+                                .clickable { showAddServiceDialog = true }
+                        )
+                    }
                 }
             }
         }
@@ -354,6 +370,29 @@ fun StandTile(
                 onDismiss = {
                     errorMessage = null
                     showAddFlightDialog = false
+                },
+                errorMessage = errorMessage
+            )
+        }
+    }
+
+    if (showAddServiceDialog) {
+        Dialog(onDismissRequest = { showAddServiceDialog = false }) {
+            AddServiceDialog(
+                onConfirm = { service ->
+                    flightVm.loadFlightForStand(standVm, stand?.standId ?: "")
+                    flightVm.addServiceToFlight(standVm, service) { ok, msg ->
+                        if (ok) {
+                            errorMessage = null
+                            showAddServiceDialog = false
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = {
+                    errorMessage = null
+                    showAddServiceDialog = false
                 },
                 errorMessage = errorMessage
             )

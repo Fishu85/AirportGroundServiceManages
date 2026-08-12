@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.agsm.stand.Stand
 import com.example.agsm.stand.StandRepository
 import com.example.agsm.stand.StandViewModel
+import com.google.api.Service
 
 class FlightViewModel(
     private val flightRepo: FlightRepository = FlightRepository(),
@@ -66,7 +67,7 @@ class FlightViewModel(
             ) { assignOk, assignMsg ->
                 if (assignOk) {
                     standVm.getStand(stand.standId)
-                    loadFlightForStand(stand.standId)
+                    loadFlightForStand( standVm, stand.standId)
                     onResult(true, msg)
                 } else {
                     error = assignMsg
@@ -77,10 +78,21 @@ class FlightViewModel(
     }
 
     fun loadFlightForStand(
+        standVm: StandViewModel,
         standId: String
     ) {
         flightRepo.getFlightForStand(standId) { loadedFlight ->
-            flight = loadedFlight
+
+            if (loadedFlight != null) {
+                flight = loadedFlight
+                val stand = standVm.stands.firstOrNull { it?.standId == standId}
+                val updatedStand = stand?.copy(
+                    flight = loadedFlight
+                )
+                if (updatedStand != null) {
+                    standVm.updateStand(updatedStand)
+                }
+            }
         }
     }
 
@@ -101,6 +113,45 @@ class FlightViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun addServiceToFlight(
+        standVm: StandViewModel,
+        service: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val currentFlight = flight ?: run {
+            onResult(false, "Flight not loaded")
+            return
+        }
+
+        if (service.isBlank()) {
+            onResult(false, "Service cannot be blank")
+            return
+        }
+
+        flightRepo.addService(
+            flightId = currentFlight.flightId,
+            service = service
+        ) { ok, msg ->
+            if (!ok) {
+                onResult(false, msg)
+                return@addService
+            }
+
+            val updatedOperations = currentFlight.operations.toMutableList().apply {
+                add(service)
+            }
+            flight = currentFlight.copy(operations = updatedOperations)
+            val stand = standVm.stand
+            if (stand != null && stand.flight != null) {
+                val updatedStand = stand.copy(
+                    flight = stand.flight.copy(operations = updatedOperations)
+                )
+                standVm.updateStand(updatedStand)
+            }
+            onResult(true, null)
         }
     }
 }
