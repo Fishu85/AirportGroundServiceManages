@@ -34,10 +34,11 @@ fun OperationTile(
     ) {
         Box(
             modifier = Modifier
-                .weight(2f)
+                .weight(4f)
                 .padding(8.dp)
                 .background(SecondaryForeground, RoundedCornerShape(16.dp))
-                .padding(8.dp)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
         ) {
             Text(operation,
                 color = White,
@@ -47,7 +48,8 @@ fun OperationTile(
 
         Column(
             modifier = Modifier
-                .weight(1f)
+                .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(R.drawable.outline_delete_24),
