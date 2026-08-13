@@ -117,4 +117,20 @@ class FlightRepository(
                 onResult(false, e.message)
             }
     }
+
+    fun deleteService(
+        flightId: String,
+        service: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        db.collection("flights")
+            .document(flightId)
+            .update("operations", FieldValue.arrayRemove(service))
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }

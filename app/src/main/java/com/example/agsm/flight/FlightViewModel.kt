@@ -154,4 +154,20 @@ class FlightViewModel(
             onResult(true, null)
         }
     }
+
+    fun deleteService(
+        standVm: StandViewModel,
+        service: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val flightId = standVm.stand?.flight?.flightId ?: return onResult(false, "Flight not loaded")
+        flightRepo.deleteService(flightId, service) { ok, msg ->
+            if (ok) {
+                loadFlightForStand(standVm, standVm.stand?.standId ?: "")
+                onResult(true, null)
+            } else {
+                onResult(false, msg)
+            }
+        }
+    }
 }

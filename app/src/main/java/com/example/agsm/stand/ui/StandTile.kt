@@ -324,7 +324,15 @@ fun StandTile(
                             .fillMaxWidth()
                     ) {
                         stand.flight.operations.forEach { service ->
-                            OperationTile(service)
+                            OperationTile(service) {
+                                flightVm.deleteService(standVm, service) { ok, msg ->
+                                    if (!ok) {
+                                        errorMessage = msg
+                                    } else {
+                                        errorMessage = null
+                                    }
+                                }
+                            }
                         }
                     }
 

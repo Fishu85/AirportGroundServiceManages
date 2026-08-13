@@ -2,6 +2,7 @@ package com.example.agsm.flight.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,8 @@ import com.example.agsm.ui.theme.White
 
 @Composable
 fun OperationTile(
-    operation: String
+    operation: String,
+    onDelete: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -50,7 +52,11 @@ fun OperationTile(
             Image(
                 painter = painterResource(R.drawable.outline_delete_24),
                 contentDescription = "delete operation",
-                colorFilter = ColorFilter.tint(Color.Red)
+                colorFilter = ColorFilter.tint(Color.Red),
+                modifier = Modifier
+                    .clickable {
+                        onDelete()
+                    }
             )
         }
     }
