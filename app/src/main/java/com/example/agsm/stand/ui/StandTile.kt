@@ -35,6 +35,7 @@ import com.example.agsm.flight.AircraftPosition
 import com.example.agsm.flight.FlightViewModel
 import com.example.agsm.flight.ui.AddServiceDialog
 import com.example.agsm.flight.ui.CreateFlightDialog
+import com.example.agsm.flight.ui.DeleteFlightDialog
 import com.example.agsm.flight.ui.DropdownMenuAircraftPositionSelector
 import com.example.agsm.flight.ui.OperationTile
 import com.example.agsm.stand.Stand
@@ -66,6 +67,7 @@ fun StandTile(
 
     var showAddFlightDialog by remember { mutableStateOf(false) }
     var showAddServiceDialog by remember { mutableStateOf(false) }
+    var showDeleteFlightDialog by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -350,6 +352,38 @@ fun StandTile(
                         )
                     }
                 }
+
+                if (aircraftPosition == AircraftPosition.DEPARTURE && userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            onClick = { showDeleteFlightDialog = true },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red,
+                                contentColor = White
+                            )
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.outline_delete_24),
+                                    contentDescription = "delete flight",
+                                    colorFilter = ColorFilter.tint(White)
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Text("Delete",
+                                    color = White,
+                                    fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -401,6 +435,28 @@ fun StandTile(
                 onDismiss = {
                     errorMessage = null
                     showAddServiceDialog = false
+                },
+                errorMessage = errorMessage
+            )
+        }
+    }
+
+    if (showDeleteFlightDialog) {
+        Dialog(onDismissRequest = { showDeleteFlightDialog = false }) {
+            DeleteFlightDialog(
+                onConfirm = {
+                    flightVm.deleteFlight(standVm, stand!!) { ok, msg ->
+                        if (ok) {
+                            errorMessage = null
+                            showDeleteFlightDialog = false
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = {
+                    errorMessage = null
+                    showDeleteFlightDialog = false
                 },
                 errorMessage = errorMessage
             )

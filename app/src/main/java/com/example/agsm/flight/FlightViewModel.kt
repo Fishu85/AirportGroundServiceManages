@@ -170,4 +170,27 @@ class FlightViewModel(
             }
         }
     }
+
+    fun deleteFlight(
+        standVm: StandViewModel,
+        stand: Stand,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val flightId = stand.flight?.flightId ?: return onResult(false, "Flight not loaded")
+        flightRepo.deleteFlight(flightId) { ok, msg ->
+            if (!ok) {
+                onResult(false, msg)
+                return@deleteFlight
+            }
+            standRepo.removeFlightFromStand(stand.standId) { ok2, msg2 ->
+                if (!ok2) {
+                    onResult(false, msg2)
+                    return@removeFlightFromStand
+                }
+                val updatedStand = stand.copy(flight = null)
+                standVm.updateStand(updatedStand)
+                onResult(true, null)
+            }
+        }
+    }
 }

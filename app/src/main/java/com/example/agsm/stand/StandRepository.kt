@@ -124,4 +124,19 @@ class StandRepository(
                 onResult(false)
             }
     }
+
+    fun removeFlightFromStand(
+        standId: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        db.collection("stands")
+            .document(standId)
+            .update("flight", null)
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }
