@@ -68,6 +68,7 @@ fun StandTile(
     var showAddFlightDialog by remember { mutableStateOf(false) }
     var showAddServiceDialog by remember { mutableStateOf(false) }
     var showDeleteFlightDialog by remember { mutableStateOf(false) }
+    var showDeleteStandDialog by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -86,7 +87,7 @@ fun StandTile(
         ) {
             Column(
                 modifier = Modifier
-                    .weight(10f),
+                    .weight(9f),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -95,6 +96,26 @@ fun StandTile(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f),
+                horizontalAlignment = Alignment.End
+            ) {
+                if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                    Image(
+                        painter = painterResource(R.drawable.outline_delete_24),
+                        contentDescription = "delete stand",
+                        colorFilter = ColorFilter.tint(Color.Red),
+                        modifier = Modifier
+                            .clickable{
+                                showDeleteStandDialog = true
+                            }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -457,6 +478,28 @@ fun StandTile(
                 onDismiss = {
                     errorMessage = null
                     showDeleteFlightDialog = false
+                },
+                errorMessage = errorMessage
+            )
+        }
+    }
+
+    if (showDeleteStandDialog) {
+        Dialog(onDismissRequest = { showDeleteStandDialog = false }) {
+            DeleteStandDialog(
+                onConfirm = {
+                    standVm.deleteStand(stand!!) { ok, msg ->
+                        if (ok) {
+                            errorMessage = null
+                            showDeleteStandDialog = false
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = {
+                    errorMessage = null
+                    showDeleteStandDialog = false
                 },
                 errorMessage = errorMessage
             )

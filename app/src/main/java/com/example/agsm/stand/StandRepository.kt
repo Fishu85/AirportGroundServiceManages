@@ -139,4 +139,19 @@ class StandRepository(
                 onResult(false, e.message)
             }
     }
+
+    fun deleteStand(
+        standId: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        db.collection("stands")
+            .document(standId)
+            .delete()
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }

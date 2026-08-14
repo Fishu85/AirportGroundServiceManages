@@ -86,4 +86,23 @@ class StandViewModel(
         stand = newStand
         stands = stands.map { if (it?.standId == newStand?.standId) newStand else it }
     }
+
+    fun deleteStand(
+        stand: Stand,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        if (stand.flight != null) {
+            onResult(false, "Cannot delete stand with active flight")
+            return
+        }
+
+        standRepo.deleteStand(stand.standId) { ok, msg ->
+            if (ok) {
+                stands = stands.filter { it?.standId != stand.standId }
+                onResult(true, null)
+            } else {
+                onResult(false, msg)
+            }
+        }
+    }
 }
