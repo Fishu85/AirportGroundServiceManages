@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +34,7 @@ import com.example.agsm.apron.Apron
 import com.example.agsm.apron.ApronViewModel
 import com.example.agsm.flight.AircraftCategory
 import com.example.agsm.flight.FlightViewModel
+import com.example.agsm.stand.StandRepository
 import com.example.agsm.stand.StandViewModel
 import com.example.agsm.stand.ui.CreateStandDialog
 import com.example.agsm.stand.ui.StandTile
@@ -49,6 +53,7 @@ fun ApronTile(
 ) {
     var isApronTileExpanded by remember { mutableStateOf(false) }
     var showCreateStandDialog by remember { mutableStateOf(false) }
+    var showDeleteApronDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val stands = standVm.stands
         .filter { it?.apron?.apronId == apron.apronId }
@@ -128,6 +133,32 @@ fun ApronTile(
         }
 
         if (isApronTileExpanded) {
+            if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                Button(
+                    onClick = { showDeleteApronDialog = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = White
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.outline_delete_24),
+                            contentDescription = "delete apron",
+                            colorFilter = ColorFilter.tint(White)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text("Delete apron",
+                            color = White,
+                            fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -165,6 +196,28 @@ fun ApronTile(
                     onDismiss = {
                         errorMessage = null
                         showCreateStandDialog = false
+                    },
+                    errorMessage = errorMessage
+                )
+            }
+        }
+
+        if (showDeleteApronDialog) {
+            Dialog(onDismissRequest = { showDeleteApronDialog = false }) {
+                DeleteApronDialog(
+                    onConfirm = {
+                        apronVm.deleteApron(standVm.standRepo, apron) { ok, msg ->
+                            if (ok) {
+                                errorMessage = null
+                                showDeleteApronDialog = false
+                            } else {
+                                errorMessage = msg
+                            }
+                        }
+                    },
+                    onDismiss = {
+                        errorMessage = null
+                        showDeleteApronDialog = false
                     },
                     errorMessage = errorMessage
                 )

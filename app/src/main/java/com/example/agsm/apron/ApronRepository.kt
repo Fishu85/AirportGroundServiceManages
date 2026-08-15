@@ -74,4 +74,19 @@ class ApronRepository(
                 }
         }
     }
+
+    fun deleteApron(
+        apronId: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        db.collection("aprons")
+            .document(apronId)
+            .delete()
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }

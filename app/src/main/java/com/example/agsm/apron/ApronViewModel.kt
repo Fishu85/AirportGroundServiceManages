@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.agsm.airport.AirportViewModel
+import com.example.agsm.stand.StandRepository
 
 class ApronViewModel(
     private val apronRepo: ApronRepository = ApronRepository()
@@ -77,5 +78,26 @@ class ApronViewModel(
         apron: Apron
     ) {
         this.apron = apron
+    }
+
+    fun deleteApron(
+        standRepo: StandRepository,
+        apron: Apron,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        standRepo.getStandsForApron(apron.apronId) { stands ->
+            if (stands.isNotEmpty()) {
+                onResult(false, "Cannot delete apron with assigned stands")
+                return@getStandsForApron
+            }
+            apronRepo.deleteApron(apron.apronId) { ok, msg ->
+                if (ok) {
+                    aprons = aprons.filter { it.apronId != apron.apronId }
+                    onResult(true, null)
+                } else {
+                    onResult(false, msg)
+                }
+            }
+        }
     }
 }

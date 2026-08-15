@@ -8,7 +8,7 @@ import com.example.agsm.apron.ApronViewModel
 import com.example.agsm.flight.AircraftCategory
 
 class StandViewModel(
-    private val standRepo: StandRepository = StandRepository()
+    val standRepo: StandRepository = StandRepository()
 ) : ViewModel() {
     var error by mutableStateOf<String?>(null)
     var stand by mutableStateOf<Stand?>(null)
