@@ -134,29 +134,12 @@ fun ApronTile(
 
         if (isApronTileExpanded) {
             if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
-                Button(
-                    onClick = { showDeleteApronDialog = true },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red,
-                        contentColor = White
-                    )
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.outline_delete_24),
-                            contentDescription = "delete apron",
-                            colorFilter = ColorFilter.tint(White)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text("Delete apron",
-                            color = White,
-                            fontWeight = FontWeight.Bold)
-                    }
-                }
+                Text("Delete apron",
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .clickable{showDeleteApronDialog = true})
             }
 
             Column(
