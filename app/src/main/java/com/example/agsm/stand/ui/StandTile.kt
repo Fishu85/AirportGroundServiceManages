@@ -37,6 +37,7 @@ import com.example.agsm.flight.ui.AddServiceDialog
 import com.example.agsm.flight.ui.CreateFlightDialog
 import com.example.agsm.flight.ui.DeleteFlightDialog
 import com.example.agsm.flight.ui.DropdownMenuAircraftPositionSelector
+import com.example.agsm.flight.ui.EditFlightDialog
 import com.example.agsm.flight.ui.OperationTile
 import com.example.agsm.stand.Stand
 import com.example.agsm.stand.StandViewModel
@@ -69,6 +70,7 @@ fun StandTile(
     var showAddServiceDialog by remember { mutableStateOf(false) }
     var showDeleteFlightDialog by remember { mutableStateOf(false) }
     var showDeleteStandDialog by remember { mutableStateOf(false) }
+    var showEditFlightDialog by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -282,53 +284,81 @@ fun StandTile(
             if(stand?.flight != null) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(
                         modifier = Modifier
-                            .weight(1f),
-                        horizontalAlignment = Alignment.Start
+                            .weight(5f)
                     ) {
-                        Text(stand.flight.aircraftModel,
-                            color = White,
-                            fontWeight = FontWeight.Bold)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f),
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                Text(stand.flight.aircraftModel,
+                                    color = White,
+                                    fontWeight = FontWeight.Bold)
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f),
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(stand.flight.airline,
+                                    color = White,
+                                    fontWeight = FontWeight.Bold)
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f),
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                Text(stand.flight.registrationNumber,
+                                    color = White,
+                                    fontWeight = FontWeight.Bold)
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f),
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(stand.flight.flightNumber,
+                                    color = White,
+                                    fontWeight = FontWeight.Bold)
+                            }
+                        }
                     }
 
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Text(stand.flight.airline,
-                            color = White,
-                            fontWeight = FontWeight.Bold)
+                    if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.baseline_edit_24),
+                                contentDescription = "edit flight",
+                                colorFilter = ColorFilter.tint(White),
+                                modifier = Modifier
+                                    .clickable { showEditFlightDialog = true }
+                            )
+                        }
                     }
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(stand.flight.registrationNumber,
-                            color = White,
-                            fontWeight = FontWeight.Bold)
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Text(stand.flight.flightNumber,
-                            color = White,
-                            fontWeight = FontWeight.Bold)
-                    }
-                }
 
                 Row(
                     modifier = Modifier
@@ -433,6 +463,42 @@ fun StandTile(
                 onDismiss = {
                     errorMessage = null
                     showAddFlightDialog = false
+                },
+                errorMessage = errorMessage
+            )
+        }
+    }
+
+    if (showEditFlightDialog) {
+        val flight = flightVm.flight
+        Dialog(onDismissRequest = { showEditFlightDialog = false }) {
+            EditFlightDialog(
+                currentModel = flight?.aircraftModel ?: "",
+                currentCategory = flight?.aircraftCategory ?: AircraftCategory.A,
+                currentAirline = flight?.airline ?: "",
+                currentRegistrationNumber = flight?.registrationNumber ?: "",
+                currentFlightNumber = flight?.flightNumber ?: "",
+                onConfirm = { aircraftModel, aircraftCategory, airline, registrationNumber, flightNumber ->
+                    standVm.updateStand(stand)
+                    flightVm.updateFlight(
+                        standVm = standVm,
+                        aircraftModel = aircraftModel,
+                        aircraftCategory = aircraftCategory,
+                        airline = airline,
+                        registrationNumber = registrationNumber,
+                        flightNumber = flightNumber
+                    ) { ok, msg ->
+                        if (ok) {
+                            errorMessage = null
+                            showEditFlightDialog = false
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = {
+                    errorMessage = null
+                    showEditFlightDialog = false
                 },
                 errorMessage = errorMessage
             )

@@ -193,4 +193,53 @@ class FlightViewModel(
             }
         }
     }
+
+    fun updateFlight(
+        standVm: StandViewModel,
+        aircraftModel: String,
+        aircraftCategory: AircraftCategory,
+        airline: String,
+        registrationNumber: String,
+        flightNumber: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val flightId = standVm.stand?.flight?.flightId ?: return onResult(false, "Flight not loaded")
+
+        val stand = standVm.stand ?: run {
+            onResult(false, "Stand not loaded")
+            return
+        }
+
+        if (aircraftModel.isBlank()) {
+            onResult(false, "Aircraft model cannot be empty")
+            return
+        }
+
+        if (registrationNumber.isBlank()) {
+            onResult(false, "Registration number cannot be empty")
+            return
+        }
+
+        if (!stand.categories.contains(aircraftCategory)) {
+            onResult(false, "This stand doesn't accept chosen aircraft category")
+            return
+        }
+
+        flightRepo.updateFlight(
+            flightId = flightId,
+            aircraftModel = aircraftModel,
+            aircraftCategory = aircraftCategory,
+            airline = airline,
+            registrationNumber = registrationNumber,
+            flightNumber = flightNumber
+        ) { ok, msg ->
+            if (!ok) {
+                onResult(false, msg)
+                return@updateFlight
+            }
+
+            loadFlightForStand(standVm, standVm.stand?.standId ?: "")
+            onResult(true, null)
+        }
+    }
 }

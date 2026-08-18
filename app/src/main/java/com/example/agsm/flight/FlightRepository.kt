@@ -148,4 +148,32 @@ class FlightRepository(
                 onResult(false, e.message)
             }
     }
+
+    fun updateFlight(
+        flightId: String,
+        aircraftModel: String,
+        aircraftCategory: AircraftCategory,
+        airline: String,
+        registrationNumber: String,
+        flightNumber: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val updates = mapOf(
+            "aircraftModel" to aircraftModel,
+            "aircraftCategory" to aircraftCategory,
+            "airline" to airline,
+            "registrationNumber" to registrationNumber,
+            "flightNumber" to flightNumber
+        )
+
+        db.collection("flights")
+            .document(flightId)
+            .update(updates)
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }
