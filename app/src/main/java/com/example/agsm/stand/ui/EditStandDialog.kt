@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agsm.R
+import com.example.agsm.flight.AircraftCategory
 import com.example.agsm.ui.theme.Green
 import com.example.agsm.ui.theme.PrimaryForeground
 import com.example.agsm.ui.theme.SecondaryBackground
@@ -38,8 +40,10 @@ import com.example.agsm.ui.theme.SecondaryText
 import com.example.agsm.ui.theme.White
 
 @Composable
-fun CreateStandDialog(
-    onConfirm: (standNumber: String, A: Boolean, B: Boolean, C: Boolean, D:Boolean, E: Boolean, F: Boolean) -> Unit,
+fun EditStandDialog(
+    currentStandNumber: String,
+    currentCategories: List<AircraftCategory>,
+    onConfirm: (String, List<AircraftCategory>) -> Unit,
     onDismiss: () -> Unit,
     errorMessage: String? = null
 ) {
@@ -52,6 +56,16 @@ fun CreateStandDialog(
     var isESelected by remember { mutableStateOf(false) }
     var isFSelected by remember { mutableStateOf(false) }
 
+    LaunchedEffect(currentStandNumber, currentCategories) {
+        standNumber = currentStandNumber
+
+        isASelected = currentCategories.contains(AircraftCategory.A)
+        isBSelected = currentCategories.contains(AircraftCategory.B)
+        isCSelected = currentCategories.contains(AircraftCategory.C)
+        isDSelected = currentCategories.contains(AircraftCategory.D)
+        isESelected = currentCategories.contains(AircraftCategory.E)
+        isFSelected = currentCategories.contains(AircraftCategory.F)
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,18 +73,13 @@ fun CreateStandDialog(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Create Stand",
+        Text("Edit stand",
             color = White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Enter the name of the stand",
-            color = White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp)
 
         TextField(
             value = standNumber,
@@ -264,15 +273,17 @@ fun CreateStandDialog(
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
-                onClick = { onConfirm(
-                    standNumber,
-                    isASelected,
-                    isBSelected,
-                    isCSelected,
-                    isDSelected,
-                    isESelected,
-                    isFSelected
-                ) },
+                onClick = {
+                    val selectedCategories = mutableListOf<AircraftCategory>()
+                    if (isASelected) selectedCategories.add(AircraftCategory.A)
+                    if (isBSelected) selectedCategories.add(AircraftCategory.B)
+                    if (isCSelected) selectedCategories.add(AircraftCategory.C)
+                    if (isDSelected) selectedCategories.add(AircraftCategory.D)
+                    if (isESelected) selectedCategories.add(AircraftCategory.E)
+                    if (isFSelected) selectedCategories.add(AircraftCategory.F)
+
+                    onConfirm(standNumber, selectedCategories)
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Green,
                     contentColor = White

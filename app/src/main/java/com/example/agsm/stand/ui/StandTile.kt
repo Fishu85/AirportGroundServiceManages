@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.agsm.R
+import com.example.agsm.apron.ApronViewModel
 import com.example.agsm.flight.AircraftCategory
 import com.example.agsm.flight.AircraftPosition
 import com.example.agsm.flight.FlightViewModel
@@ -53,12 +54,14 @@ fun StandTile(
     stand: Stand?,
     userVm: UserViewModel,
     flightVm: FlightViewModel,
-    standVm: StandViewModel
+    standVm: StandViewModel,
+    apronVm: ApronViewModel
 ) {
     var isStandTileExpanded by remember { mutableStateOf(false) }
 
     val categories = stand?.categories ?: emptyList()
 
+    /*
     var isAEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.A)) }
     var isBEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.B)) }
     var isCEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.C)) }
@@ -66,11 +69,21 @@ fun StandTile(
     var isEEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.E)) }
     var isFEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.F)) }
 
+
+     */
+    val isAEnabled = categories.contains(AircraftCategory.A)
+    val isBEnabled = categories.contains(AircraftCategory.B)
+    val isCEnabled = categories.contains(AircraftCategory.C)
+    val isDEnabled = categories.contains(AircraftCategory.D)
+    val isEEnabled = categories.contains(AircraftCategory.E)
+    val isFEnabled = categories.contains(AircraftCategory.F)
+
     var showAddFlightDialog by remember { mutableStateOf(false) }
     var showAddServiceDialog by remember { mutableStateOf(false) }
     var showDeleteFlightDialog by remember { mutableStateOf(false) }
     var showDeleteStandDialog by remember { mutableStateOf(false) }
     var showEditFlightDialog by remember { mutableStateOf(false) }
+    var showEditStandDialog by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -89,7 +102,7 @@ fun StandTile(
         ) {
             Column(
                 modifier = Modifier
-                    .weight(9f),
+                    .weight(8f),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -98,6 +111,26 @@ fun StandTile(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f),
+                horizontalAlignment = Alignment.End
+            ) {
+                if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                    Image(
+                        painter = painterResource(R.drawable.baseline_edit_24),
+                        contentDescription = "edit stand",
+                        colorFilter = ColorFilter.tint(White),
+                        modifier = Modifier
+                            .clickable{
+                                showEditStandDialog = true
+                            }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -499,6 +532,35 @@ fun StandTile(
                 onDismiss = {
                     errorMessage = null
                     showEditFlightDialog = false
+                },
+                errorMessage = errorMessage
+            )
+        }
+    }
+
+    if (showEditStandDialog) {
+        val stand = standVm.stand
+        Dialog(onDismissRequest = { showEditStandDialog = false}) {
+            EditStandDialog(
+                currentStandNumber = stand?.standNumber ?: "",
+                currentCategories = stand?.categories ?: emptyList(),
+                onConfirm = { standNumber, categories ->
+                    standVm.editStand(
+                        apronVm = apronVm,
+                        standNumber = standNumber,
+                        categories = categories
+                    ) { ok, msg ->
+                        if (ok) {
+                            showEditStandDialog = false
+                            errorMessage = null
+                        } else {
+                            errorMessage = msg
+                        }
+                    }
+                },
+                onDismiss = {
+                    showEditStandDialog = false
+                    errorMessage = null
                 },
                 errorMessage = errorMessage
             )

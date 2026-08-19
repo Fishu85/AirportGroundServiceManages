@@ -147,7 +147,7 @@ fun ApronTile(
                     .fillMaxWidth()
             ) {
                 stands.forEach { stand ->
-                    StandTile(stand, userVm, flightVm, standVm)
+                    StandTile(stand, userVm, flightVm, standVm, apronVm)
                 }
             }
         }

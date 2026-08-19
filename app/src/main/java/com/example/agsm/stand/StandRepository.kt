@@ -154,4 +154,26 @@ class StandRepository(
                 onResult(false, e.message)
             }
     }
+
+    fun updateStand(
+        standId: String,
+        standNumber: String,
+        categories: List<AircraftCategory>,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val updates = mapOf(
+            "standNumber" to standNumber,
+            "categories" to categories,
+        )
+
+        db.collection("stands")
+            .document(standId)
+            .update(updates)
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }

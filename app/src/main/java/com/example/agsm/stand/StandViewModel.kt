@@ -105,4 +105,54 @@ class StandViewModel(
             }
         }
     }
+
+    fun editStand(
+        apronVm: ApronViewModel,
+        standNumber: String,
+        categories: List<AircraftCategory>,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val currentStand = stand ?: run {
+            onResult(false, "Stand not loaded")
+            return
+        }
+
+        val flightCategory = currentStand.flight?.aircraftCategory
+        if (flightCategory != null && !categories.contains(flightCategory)) {
+            onResult(false, "Cannot remove category $flightCategory because the assigned flight requires it")
+            return
+        }
+
+        if (standNumber.isBlank()) {
+            onResult(false, "Stand number cannot be empty")
+            return
+        }
+
+        if (categories.isEmpty()) {
+            onResult(false, "At least one category must be selected")
+            return
+        }
+
+        standRepo.updateStand(
+            standId = stand?.standId ?: "",
+            standNumber = standNumber,
+            categories = categories
+        ) { ok, msg ->
+            if (!ok) {
+                onResult(false, msg)
+                return@updateStand
+            }
+
+            val updated = currentStand.copy(
+                standNumber = standNumber,
+                categories = categories
+            )
+
+            updateStand(updated)
+            apronVm.apron?.apronId?.let { apronId ->
+                loadStandsForApron(apronId)
+            }
+            onResult(true, null)
+        }
+    }
 }
