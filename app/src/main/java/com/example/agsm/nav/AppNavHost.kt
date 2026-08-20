@@ -73,7 +73,7 @@ fun AppNavHost() {
                 LoginScreen(
                     userVm = userVm,
                     onLoggedIn = {
-                        nav.navigate("home") {
+                        nav.navigate("airport_details") {
                             popUpTo("login") {
                                 inclusive = true
                             }
@@ -92,7 +92,7 @@ fun AppNavHost() {
             composable("register") {
                 RegisterScreen(
                     onRegistered = {
-                        nav.navigate("home") {
+                        nav.navigate("airport_details") {
                             popUpTo("register") {
                                 inclusive = true
                             }
@@ -118,13 +118,13 @@ fun AppNavHost() {
                     authVm = authVm,
                     onLogout = {
                         nav.navigate("login") {
-                            popUpTo("home") {
+                            popUpTo("airport_details") {
                                 inclusive = true
                             }
                         }
                     },
                     onReturn = {
-                        nav.navigate("home") {
+                        nav.navigate("airport_details") {
                             popUpTo("profile") {
                                 inclusive = true
                             }
