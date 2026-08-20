@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -54,6 +55,7 @@ fun ApronTile(
     var isApronTileExpanded by remember { mutableStateOf(false) }
     var showCreateStandDialog by remember { mutableStateOf(false) }
     var showDeleteApronDialog by remember { mutableStateOf(false) }
+    var showEditApronDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val stands = standVm.stands
         .filter { it?.apron?.apronId == apron.apronId }
@@ -72,7 +74,7 @@ fun ApronTile(
         ) {
             Column(
                 modifier = Modifier
-                    .weight(10f),
+                    .weight(9f),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(apron.apronNumber,
@@ -86,7 +88,29 @@ fun ApronTile(
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1f),
+                horizontalAlignment = Alignment.End
+            ) {
+                if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
+                    Image(
+                        painter = painterResource(R.drawable.baseline_edit_24),
+                        contentDescription = "edit apron",
+                        colorFilter = ColorFilter.tint(White),
+                        modifier = Modifier
+                            .clickable {
+                                apronVm.selectApron(apron)
+                                showEditApronDialog = true
+                            }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f),
+                horizontalAlignment = Alignment.End
             ) {
                 if (userVm.user?.role == Role.OPERATIONS_MANAGER) {
                     Text("+",
@@ -201,6 +225,32 @@ fun ApronTile(
                     onDismiss = {
                         errorMessage = null
                         showDeleteApronDialog = false
+                    },
+                    errorMessage = errorMessage
+                )
+            }
+        }
+
+        if (showEditApronDialog) {
+            val apron = apronVm.apron
+            Dialog(onDismissRequest = { showEditApronDialog = false}) {
+                EditApronDialog(
+                    currentApronNumber = apron?.apronNumber ?: "",
+                    onConfirm = { apronNumber ->
+                        apronVm.updateApron(
+                            apronNumber = apronNumber
+                        ) { ok, msg ->
+                            if (ok) {
+                                showEditApronDialog = false
+                                errorMessage = null
+                            } else {
+                                errorMessage = msg
+                            }
+                        }
+                    },
+                    onDismiss = {
+                        showEditApronDialog = false
+                        errorMessage = null
                     },
                     errorMessage = errorMessage
                 )

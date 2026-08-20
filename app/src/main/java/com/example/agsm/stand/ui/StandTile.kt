@@ -61,16 +61,6 @@ fun StandTile(
 
     val categories = stand?.categories ?: emptyList()
 
-    /*
-    var isAEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.A)) }
-    var isBEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.B)) }
-    var isCEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.C)) }
-    var isDEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.D)) }
-    var isEEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.E)) }
-    var isFEnabled by remember { mutableStateOf(categories.contains(AircraftCategory.F)) }
-
-
-     */
     val isAEnabled = categories.contains(AircraftCategory.A)
     val isBEnabled = categories.contains(AircraftCategory.B)
     val isCEnabled = categories.contains(AircraftCategory.C)

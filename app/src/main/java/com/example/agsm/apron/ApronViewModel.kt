@@ -100,4 +100,36 @@ class ApronViewModel(
             }
         }
     }
+
+    fun updateApron(
+        apronNumber: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val currentApron = apron ?: run {
+            onResult(false, "Apron not loaded")
+            return
+        }
+
+        if (apronNumber.isBlank()) {
+            onResult(false, "Apron name cannot be empty")
+            return
+        }
+
+        apronRepo.updateApron(
+            apronId = currentApron.apronId,
+            apronNumber = apronNumber
+        ) { ok, msg ->
+            if (!ok) {
+                onResult(false, msg)
+                return@updateApron
+            }
+
+            val updated = currentApron.copy(apronNumber = apronNumber)
+            apron = updated
+            aprons = aprons.map {
+                if (it.apronId == updated.apronId) updated else it
+            }
+            onResult(true, null)
+        }
+    }
 }

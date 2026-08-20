@@ -89,4 +89,24 @@ class ApronRepository(
                 onResult(false, e.message)
             }
     }
+
+    fun updateApron(
+        apronId: String,
+        apronNumber: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        val updates = mapOf(
+            "apronNumber" to apronNumber
+        )
+
+        db.collection("aprons")
+            .document(apronId)
+            .update(updates)
+            .addOnSuccessListener {
+                onResult(true, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+    }
 }
