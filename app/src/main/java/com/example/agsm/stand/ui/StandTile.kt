@@ -147,7 +147,7 @@ fun StandTile(
 
             Column(
                 modifier = Modifier
-                    .weight(2f)
+                    .weight(4f)
             ) {
                 Row(
                     modifier = Modifier

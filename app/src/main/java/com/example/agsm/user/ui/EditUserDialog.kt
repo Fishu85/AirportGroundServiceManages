@@ -159,7 +159,7 @@ fun EditUserDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
                 Button(
                     onClick = {
@@ -186,7 +186,8 @@ fun EditUserDialog(
 
                         Text("Confirm",
                             fontWeight = FontWeight.Bold,
-                            color = Color.White)
+                            color = Color.White,
+                            maxLines = 1)
                     }
                 }
             }
